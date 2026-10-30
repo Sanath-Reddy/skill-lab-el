@@ -1,0 +1,26 @@
+{
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=client\" \"npm run dev --workspace=server\"",
+    "build": "npm run build --workspace=client",
+    "lint": "npm run lint --workspace=client"
+  },
+  "dependencies": {
+
+    "@clerk/clerk-sdk-node": "^4.13.23",
+    "concurrently": "^9.1.2",
+    "lucide-react": "^0.525.0",
+    "mongodb": "^6.17.0"
+
+    
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-helmet-async": "^2.0.5",
+    "react-leaflet": "^4.2.1"
+
+  }
+}
