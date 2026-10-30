@@ -41,19 +41,77 @@ RaktConnect is a **MERN + AI-powered** blood donation platform that connects **h
 
 ## 📌 Installation & Setup
 
-Everything installs inside the project folder (no global installs).
+### Prerequisites
+- **Node.js 18+** (with npm)
+- **Python 3.10+** (with `venv`; on Debian/Ubuntu: `sudo apt install python3-venv`)
+- Internet on the first run (downloads packages and a local MongoDB binary, ~80 MB)
 
+Nothing is installed globally — all dependencies live inside the project folder.
+
+### 1️⃣ Clone and install
 ```
-npm run setup   # node packages + Python venv in ai-backend/.venv
-npm run dev     # client :5173, server :5000, AI backend :8000
+git clone https://github.com/Sanath-Reddy/skill-lab-el.git
+cd skill-lab-el
+npm run setup
+```
+`npm run setup` installs the Node packages (client + server) and creates a Python
+virtual environment in `ai-backend/.venv` with the AI dependencies.
+
+### 2️⃣ Run
+```
+npm run dev
+```
+This starts all three services:
+
+| Service    | URL                     |
+|------------|-------------------------|
+| Frontend   | http://localhost:5173   |
+| API server | http://localhost:5000   |
+| AI backend | http://localhost:8000   |
+
+Open http://localhost:5173. The first start takes a minute while MongoDB downloads
+(into `server/.mongo-bin`) and the AI models train.
+
+### 3️⃣ Log in
+Demo accounts are created automatically on the first run:
+
+| Role     | Email               | Password    |
+|----------|---------------------|-------------|
+| Patient  | patient@demo.com    | `Demo@1234` |
+| Donor    | donor@demo.com      | `Demo@1234` |
+| Hospital | hospital@demo.com   | `Demo@1234` |
+
+You can also create new accounts from the login page (passwords need A-Z, a-z,
+0-9 and a symbol; phone numbers must be valid 10-digit Indian numbers).
+To try the patient search, pick **Karnataka → Bengaluru Urban** (or Mysuru).
+
+### ⚙️ Environment variables (optional)
+**No `.env` file is required to run locally.** Defaults:
+
+- Without `MONGO_URI`, the server runs its own MongoDB with data stored in
+  `server/.mongo-data` (delete that folder to reset the database).
+- `JWT_SECRET` falls back to a development secret.
+
+To customise, copy the example file and edit it:
+```
+cp server/.env.example server/.env
 ```
 
-- No `.env` needed locally: without `MONGO_URI` the server starts a local MongoDB
-  (downloaded once into `server/.mongo-bin`, data kept in `server/.mongo-data`).
-  See `server/.env.example` to use your own MongoDB / JWT secret.
-- Demo accounts are seeded on first run: `patient@demo.com`, `donor@demo.com`,
-  `hospital@demo.com` — password `Demo@1234`. Or sign up from the login page.
-- Client env (optional): `VITE_API_URL`, `VITE_AI_URL` to point at deployed backends.
+| File          | Variable       | Purpose                                         |
+|---------------|----------------|-------------------------------------------------|
+| `server/.env` | `MONGO_URI`    | Use your own MongoDB (e.g. MongoDB Atlas)       |
+| `server/.env` | `JWT_SECRET`   | Secret used to sign login tokens (set in prod)  |
+| `server/.env` | `PORT`         | API port (default `5000`)                       |
+| `client/.env` | `VITE_API_URL` | API server URL (default `http://localhost:5000`) |
+| `client/.env` | `VITE_AI_URL`  | AI backend URL (default `http://localhost:8000`) |
+| `ai-backend/.env` | `MONGO_URI` | Optional extra blood-demand history for forecasting |
+
+### Running services separately
+```
+npm run dev --workspace=client   # frontend
+npm run dev --workspace=server   # API server
+npm run ai                       # AI backend
+```
 
 ## 📝 License
 
