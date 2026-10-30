@@ -3,10 +3,9 @@ import validator from "validator";
 
 const donorSchema = mongoose.Schema(
   {
-    clerkUserId: {
+    password: {
       type: String,
       required: true,
-      unique: true,
     },
     name: {
       type: String,
@@ -39,9 +38,17 @@ const donorSchema = mongoose.Schema(
     },
     bloodType: {
       type: String,
-      lowercase: true,
       enum: {
-        values: ["a+", "a-", "b+", "b-", "ab+", "ab-", "o+", "o-"],
+        values: [
+          "A_positive",
+          "A_negative",
+          "B_positive",
+          "B_negative",
+          "AB_positive",
+          "AB_negative",
+          "O_positive",
+          "O_negative",
+        ],
         message: `{VALUE} is not a valid blood type`,
       },
     },

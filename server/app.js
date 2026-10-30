@@ -3,8 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
 
-import { ClerkExpressWithAuth } from "@clerk/clerk-sdk-node";
 import connectDB from "./config/connectDB.js";
+import seedDemoData from "./utils/seed.js";
 
 import authRouter from "./routes/auth.js";
 import apiRouter from "./routes/apiRoutes.js";
@@ -13,9 +13,7 @@ import donorRouter from "./routes/donorAPI.js";
 import hospitalRouter from "./routes/hospitalAPI.js";
 
 const app = express();
-const PORT = process.env.PORT;
-
-app.use(ClerkExpressWithAuth());
+const PORT = process.env.PORT || 5000;
 
 app.use((req, res, next) => {
   console.log("Incoming request:", req.method, req.path);
@@ -24,7 +22,7 @@ app.use((req, res, next) => {
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://raktconnect.onrender.com"],
+    origin: [/^http:\/\/localhost:\d+$/, "https://raktconnect.onrender.com"],
     credentials: true,
   })
 );
@@ -43,12 +41,14 @@ app.get("/", (req, res) => {
 });
 
 connectDB()
-  .then(() => {
+  .then(async () => {
     console.log("Database connected");
+    await seedDemoData();
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
   })
   .catch((err) => {
     console.log("Error connecting to database:", err);
+    process.exit(1);
   });

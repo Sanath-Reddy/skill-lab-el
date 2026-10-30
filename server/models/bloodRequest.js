@@ -25,7 +25,7 @@ const bloodRequestSchema = mongoose.Schema(
       type: String,
       required: true,
       lowercase: true,
-      enuum: ["low", "medium", "high"],
+      enum: ["low", "medium", "high"],
     },
     requestDate: {
       type: Date,
@@ -35,7 +35,7 @@ const bloodRequestSchema = mongoose.Schema(
       type: String,
       required: true,
       lowercase: true,
-      enum: ["active", "rejected", "fulfilled", "cancelled"],
+      enum: ["active", "accepted", "rejected", "fulfilled", "cancelled"],
       default: "active",
     },
     note: {

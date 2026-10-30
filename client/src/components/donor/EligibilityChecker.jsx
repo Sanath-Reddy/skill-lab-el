@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import PageMeta from "../common/PageMeta";
+import { AI_URL } from "../../apiConfig";
 
 const EligibilityChecker = () => {
   const [formData, setFormData] = useState({
@@ -23,7 +24,7 @@ const EligibilityChecker = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:8000/check-eligibility", {
+      const response = await fetch(`${AI_URL}/check-eligibility`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

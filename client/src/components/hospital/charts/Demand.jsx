@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
 import PageMeta from "../../common/PageMeta";
+import { AI_URL } from "../../../apiConfig";
 
-const API_URL = "https://raktconnect-ai-backend.onrender.com/predict/bloodDemand";
+const API_URL = `${AI_URL}/predict/bloodDemand`;
 
 const BloodDemandChart = () => {
   const [predictions, setPredictions] = useState([]);

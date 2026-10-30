@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import PageMeta from "../common/PageMeta";
+import { AI_URL } from "../../apiConfig";
 
 const HaemoglobinPredictor = () => {
   const [formData, setFormData] = useState({
@@ -27,7 +28,7 @@ const HaemoglobinPredictor = () => {
     e.preventDefault();
     try {
       const response = await fetch(
-        "https://raktconnect-ai-backend.onrender.com/predict/haemoglobin",
+        `${AI_URL}/predict/haemoglobin`,
         {
           method: "POST",
           headers: {

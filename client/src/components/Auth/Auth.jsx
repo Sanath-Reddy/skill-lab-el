@@ -6,11 +6,7 @@ const Auth = () => {
   const navigate = useNavigate();
 
   const handleLogin = (role) => {
-    const lowercaseRole = role.toLowerCase();
-    localStorage.setItem("selectedUserType", lowercaseRole);
-    localStorage.setItem("userType", lowercaseRole);
-    localStorage.setItem("authToken", "demo_token_" + lowercaseRole);
-    navigate(`/${lowercaseRole}`);
+    navigate(`/login/${role}`);
   };
 
   useEffect(() => {

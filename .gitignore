@@ -200,3 +200,8 @@ cython_debug/
 .pypirc
 
 *.pkl
+# local runtime data
+server/.mongo-bin
+server/.mongo-data
+ai-backend/.venv
+ai-backend/*.pkl

@@ -41,27 +41,19 @@ RaktConnect is a **MERN + AI-powered** blood donation platform that connects **h
 
 ## 📌 Installation & Setup
 
-### **1️⃣ Clone the Repository**
+Everything installs inside the project folder (no global installs).
 
-In root folder
 ```
-npm install
+npm run setup   # node packages + Python venv in ai-backend/.venv
+npm run dev     # client :5173, server :5000, AI backend :8000
 ```
 
-### Start client and server separately
-```
-cd client
-npm run dev
-```
-```
-cd server
-npm run dev
-```
-### Start client and server together
-In root
-```
-npm run dev
-```
+- No `.env` needed locally: without `MONGO_URI` the server starts a local MongoDB
+  (downloaded once into `server/.mongo-bin`, data kept in `server/.mongo-data`).
+  See `server/.env.example` to use your own MongoDB / JWT secret.
+- Demo accounts are seeded on first run: `patient@demo.com`, `donor@demo.com`,
+  `hospital@demo.com` — password `Demo@1234`. Or sign up from the login page.
+- Client env (optional): `VITE_API_URL`, `VITE_AI_URL` to point at deployed backends.
 
 ## 📝 License
 

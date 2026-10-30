@@ -12,11 +12,11 @@ const validateSignupData = (req, userType) => {
 
     if (!name) {
       throw new Error("Name is invalid");
-    } else if (!validator.isEmail(emailId)) {
+    } else if (!validator.isEmail(emailId || "")) {
       throw new Error(emailId+" is invalid Email ");
-    } else if (!validator.isStrongPassword(password)) {
-      throw new Error("Password must be strong <br>  (A-Z, a-z, 0-9, symbol)");
-    } else if (!validator.isMobilePhone(phoneNumber, "en-IN")) {
+    } else if (!validator.isStrongPassword(password || "")) {
+      throw new Error("Password must be strong (A-Z, a-z, 0-9, symbol)");
+    } else if (!validator.isMobilePhone(phoneNumber || "", "en-IN")) {
       throw new Error( phoneNumber+" is invalid Phone number");
     } else if (!age) {
       throw new Error("Enter correct Age");
@@ -33,11 +33,11 @@ const validateSignupData = (req, userType) => {
 
   if (!name) {
       throw new Error("Name is invalid");
-    } else if (!validator.isEmail(emailId)) {
+    } else if (!validator.isEmail(emailId || "")) {
       throw new Error(emailId+" is invalid Email ");
-    } else if (!validator.isStrongPassword(password)) {
-      throw new Error("Password must be strong <br>  (A-Z, sa-z, 0-9, symbol)");
-    } else if (!validator.isMobilePhone(phoneNumber, "en-IN")) {
+    } else if (!validator.isStrongPassword(password || "")) {
+      throw new Error("Password must be strong (A-Z, a-z, 0-9, symbol)");
+    } else if (!validator.isMobilePhone(phoneNumber || "", "en-IN")) {
       throw new Error( phoneNumber+" is invalid Phone number");
     } else if (!age) {
       throw new Error("Enter correct Age");
@@ -56,14 +56,16 @@ const validateSignupData = (req, userType) => {
 
   if (!name) {
       throw new Error("Name is invalid");
-    } else if (!validator.isEmail(emailId)) {
+    } else if (!validator.isEmail(emailId || "")) {
       throw new Error(emailId+" is invalid Email ");
-    } else if (!validator.isStrongPassword(password)) {
-      throw new Error("Password must be strong <br>  A-Z, a-z, 0-9, symbol)");
-    } else if (!validator.isMobilePhone(phoneNumber, "en-IN")) {
+    } else if (!validator.isStrongPassword(password || "")) {
+      throw new Error("Password must be strong (A-Z, a-z, 0-9, symbol)");
+    } else if (!validator.isMobilePhone(phoneNumber || "", "en-IN")) {
       throw new Error( phoneNumber+" is invalid Phone number");
-    } else if (!age) {
-      throw new Error("Enter correct Age");
+    } else if (!licenseNumber) {
+      throw new Error("Enter license number");
+    } else if (!state || !district) {
+      throw new Error("Enter state and district");
     }
   }
 };

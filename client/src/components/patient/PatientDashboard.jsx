@@ -25,20 +25,10 @@ const PatientDashboard = () => {
   const fetchDistricts = async (selectedState) => {
     if (!selectedState) return;
 
-    const url = `https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/district?page=1&state=${encodeURIComponent(
-      selectedState
-    )}&limit=100000`;
-
-    const options = {
-      method: "GET",
-      headers: {
-        "x-rapidapi-key": "f52750023dmshe3f6d17241873e7p101b5ajsna0eb45d88394",
-        "x-rapidapi-host":
-          "india-pincode-with-latitude-and-longitude.p.rapidapi.com",
-      },
-    };
     try {
-      const response = await fetch(url, options);
+      const response = await fetch(
+        `${BASE_URL}/api/districts?state=${encodeURIComponent(selectedState)}`
+      );
       const data = await response.json();
       setDistricts(Array.isArray(data) ? data : []);
       setDistrict("");
@@ -322,7 +312,7 @@ const PatientDashboard = () => {
                       <h3 className="text-sm font-semibold text-gray-900 mb-1">
                         {hospital.name}
                       </h3>
-                      <p className="text-xs text-gray-600 mb-1">{hospital.address}</p>
+                      <p className="text-xs text-gray-600 mb-1">{hospital.district}, {hospital.state}</p>
                       <p className="text-xs text-gray-500 mb-3">Phone: {hospital.phoneNumber || "N/A"}</p>
 
                       <div className="border-t border-gray-100 pt-2 mb-3">

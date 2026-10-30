@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import PageMeta from '../common/PageMeta';
+import { AI_URL } from '../../apiConfig';
 
 const predefinedSymptoms = [
   "fever", "cough", "headache", "nausea", "fatigue",
@@ -69,7 +70,7 @@ function Disease() {
     }
 
     try {
-      const response = await fetch('https://raktconnect-ai-backend.onrender.com/predict/disease', {
+      const response = await fetch(`${AI_URL}/predict/disease`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ symptoms: selectedSymptoms }),

@@ -3,10 +3,9 @@ import validator from "validator";
 
 const hospitalSchema = mongoose.Schema(
   {
-    clerkUserId: {
+    password: {
       type: String,
       required: true,
-      unique: true,
     },
     name: {
       type: String,

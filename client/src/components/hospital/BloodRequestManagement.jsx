@@ -134,7 +134,7 @@ const BloodRequestManagement = () => {
                   {requests.map((request) => (
                     <tr key={request._id} className="hover:bg-gray-50">
                       <td className="p-3 font-mono text-gray-700">
-                        {request.patientId || request._id}
+                        {request.patientId?.name || request._id}
                       </td>
                       <td className="p-3 font-semibold text-gray-900">
                         {request.bloodType}

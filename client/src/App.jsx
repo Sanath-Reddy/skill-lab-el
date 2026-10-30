@@ -26,10 +26,7 @@ import Disease from "./components/patient/Disease";
 import Eligibility from "./components/Landing/Eligibility";
 
 import { ToastContainer } from "react-toastify";
-import { SignIn, SignUp } from "@clerk/clerk-react";
-import CompleteProfile from "./components/Auth/CompleteProfile";
-
-const clerkKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+import Login from "./components/Auth/Login";
 
 const AppLayout = () => (
   <div className="app flex flex-col min-h-screen">
@@ -60,23 +57,7 @@ function App() {
 
         {/* Auth Routes */}
         <Route path="/login" element={<Auth />} />
-        <Route
-          path="/login/patient"
-          element={clerkKey ? <SignIn routing="path" path="/login/patient" /> : <Auth />}
-        />
-        <Route
-          path="/login/donor"
-          element={clerkKey ? <SignIn routing="path" path="/login/donor" /> : <Auth />}
-        />
-        <Route
-          path="/login/hospital"
-          element={clerkKey ? <SignIn routing="path" path="/login/hospital" /> : <Auth />}
-        />
-        <Route
-          path="/sign-up"
-          element={clerkKey ? <SignUp routing="path" path="/sign-up" /> : <Auth />}
-        />
-        <Route path="/complete-profile" element={<CompleteProfile />} />
+        <Route path="/login/:userType" element={<Login />} />
 
         {/* Donor Routes */}
         <Route path="/donor" element={<Donor />}>

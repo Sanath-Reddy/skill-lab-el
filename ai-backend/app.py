@@ -23,7 +23,8 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[ "http://localhost:5173" , "https://raktconnect.onrender.com" ],
+    allow_origins=["https://raktconnect.onrender.com"],
+    allow_origin_regex=r"http://localhost:\d+",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -31,13 +32,16 @@ app.add_middleware(
 
 
 MONGO_URI = os.getenv("MONGO_URI")
-client = MongoClient(MONGO_URI)
-db = client["RaktConnect"]
-collection = db["blood_demand"]
+collection = MongoClient(MONGO_URI)["RaktConnect"]["blood_demand"] if MONGO_URI else None
 
 
 def get_historical_data():
-    historical_data = list(collection.find({}, {"_id": 0, "date": 1, "demand": 1}))
+    historical_data = []
+    if collection is not None:
+        try:
+            historical_data = list(collection.find({}, {"_id": 0, "date": 1, "demand": 1}))
+        except Exception as e:
+            print(f"MongoDB unavailable, using CSV only: {e}")
 
     csv_file = "blood_demand_data.csv"
     if os.path.exists(csv_file):
@@ -72,7 +76,7 @@ def predict_blood_demand():
     model = Prophet()
     model.fit(df)
 
-    future = model.make_future_dataframe(periods=6, freq='M')
+    future = model.make_future_dataframe(periods=6, freq='ME')
     forecast = model.predict(future)
 
     predictions = forecast[["ds", "yhat"]].tail(6).to_dict(orient="records")
@@ -181,3 +185,30 @@ def predict_disease(symptom_data: SymptomData):
     symptoms_vectorized = mlb.transform([symptom_data.symptoms])
     prediction = disease_model.predict(symptoms_vectorized)
     return {"predicted_disease": prediction[0]}
+
+
+
+class EligibilityData(BaseModel):
+    weight: float
+    lastDonation: float
+    recentTravel: float | None = None
+    medications: str = ""
+    healthCondition: str = "none"
+
+@app.post("/check-eligibility")
+def check_eligibility(data: EligibilityData):
+    reasons = []
+    if data.weight < 50:
+        reasons.append("weight must be at least 50 kg")
+    if data.lastDonation < 90:
+        reasons.append(f"wait {int(90 - data.lastDonation)} more days since your last donation")
+    if data.recentTravel is not None and data.recentTravel < 28:
+        reasons.append("wait 28 days after international travel")
+    if data.healthCondition in ("anemia", "hypertension", "diabetes"):
+        reasons.append(f"{data.healthCondition} requires a doctor's clearance")
+    if data.medications.strip() and data.medications.strip().lower() not in ("none", "no"):
+        reasons.append("current medications must be reviewed by a doctor")
+
+    if reasons:
+        return {"isEligible": False, "message": "Not eligible: " + "; ".join(reasons) + "."}
+    return {"isEligible": True, "message": "You meet the basic criteria to donate blood."}
