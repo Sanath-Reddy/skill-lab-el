@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FaUser,
   FaHeartbeat,
@@ -9,10 +10,12 @@ import {
 } from "react-icons/fa";
 import BASE_URL from "../../apiConfig";
 import PageMeta from "../common/PageMeta";
+
 const PatientProfile = () => {
   const [patient, setPatient] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const token = localStorage.getItem("authToken");
   const userType = localStorage.getItem("userType");
@@ -38,7 +41,6 @@ const PatientProfile = () => {
         }
 
         const data = await response.json();
-        console.log(data);
         setPatient(data.user);
       } catch (err) {
         setError(err.message);
@@ -48,87 +50,82 @@ const PatientProfile = () => {
     };
 
     fetchPatientData();
-  }, []);
+  }, [navigate, token, userType]);
 
   if (loading) {
     return (
-    
       <div className="p-8 bg-gray-50 min-h-screen">
-        <div className="w-full p-6 bg-white rounded-lg shadow-md animate-pulse">
-          <div className="h-6 w-1/3 bg-gray-300 rounded mb-4"></div>
-          <div className="space-y-3">
-            {Array(6)
-              .fill(0)
-              .map((_, index) => (
-                <div key={index} className="flex items-center space-x-3">
-                  <div className="h-5 w-5 bg-gray-300 rounded-full"></div>
-                  <div className="h-5 w-2/3 bg-gray-300 rounded"></div>
-                </div>
-              ))}
-          </div>
+        <div className="max-w-xl mx-auto p-6 bg-white rounded border border-gray-200 text-sm text-gray-500">
+          Loading patient profile...
         </div>
       </div>
     );
   }
 
-
   return (
-      <>
-      <PageMeta title="PatientProfile | RaktConnect" />
+    <>
+      <PageMeta title="Patient Profile | RaktConnect" />
 
-    <div className="p-8 bg-gray-50 min-h-screen">
-      
-      
-      <div className="w-full mx-auto bg-white p-8 shadow-lg rounded-lg space-y-6">
-        <h3 className="text-2xl font-semibold text-gray-800 border-b-2 pb-4 mb-6">
-          Personal Information
-        </h3>
-
-        <div className="space-y-4">
-          <div className="flex items-center space-x-4">
-            <FaUser className="text-gray-600 text-xl" />
-            <p className="text-lg text-gray-700">
-              <strong>Name:</strong> {patient?.name}
-            </p>
+      <div className="p-8 bg-gray-50 min-h-screen">
+        <div className="max-w-xl mx-auto bg-white p-6 rounded border border-gray-200">
+          <div className="border-b border-gray-200 pb-3 mb-4">
+            <h1 className="text-lg font-bold text-gray-900">Patient Profile</h1>
+            <p className="text-xs text-gray-500">Your personal patient account details</p>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <FaAngleDoubleUp className="text-gray-600 text-xl" />
-            <p className="text-lg text-gray-700">
-              <strong>Age:</strong> {patient?.age}
-            </p>
-          </div>
+          {error && <div className="text-xs text-red-600 mb-3">{error}</div>}
 
-          <div className="flex items-center space-x-4">
-            <FaHeartbeat className="text-gray-600 text-xl" />
-            <p className="text-lg text-gray-700">
-              <strong>Blood Type:</strong> {patient?.bloodType?.toUpperCase()}
-            </p>
-          </div>
+          <div className="space-y-3 text-sm">
+            <div className="flex items-center gap-3 p-2 bg-gray-50 border border-gray-100 rounded">
+              <FaUser className="text-gray-500" />
+              <div>
+                <span className="text-xs text-gray-500 block">Name</span>
+                <strong className="text-gray-800">{patient?.name || "N/A"}</strong>
+              </div>
+            </div>
 
-          <div className="flex items-center space-x-4">
-            <FaPhoneAlt className="text-gray-600 text-xl" />
-            <p className="text-lg text-gray-700">
-              <strong>Contact:</strong> {patient?.phoneNumber}
-            </p>
-          </div>
+            <div className="flex items-center gap-3 p-2 bg-gray-50 border border-gray-100 rounded">
+              <FaAngleDoubleUp className="text-gray-500" />
+              <div>
+                <span className="text-xs text-gray-500 block">Age</span>
+                <strong className="text-gray-800">{patient?.age || "N/A"}</strong>
+              </div>
+            </div>
 
-          <div className="flex items-center space-x-4">
-            <FaEnvelope className="text-gray-600 text-xl" />
-            <p className="text-lg text-gray-700">
-              <strong>Email:</strong> {patient?.emailId}
-            </p>
-          </div>
+            <div className="flex items-center gap-3 p-2 bg-gray-50 border border-gray-100 rounded">
+              <FaHeartbeat className="text-red-600" />
+              <div>
+                <span className="text-xs text-gray-500 block">Blood Group</span>
+                <strong className="text-red-700">{patient?.bloodType?.toUpperCase() || "Not specified"}</strong>
+              </div>
+            </div>
 
-          <div className="flex items-center space-x-4">
-            <FaNotesMedical className="text-gray-600 text-xl" />
-            <p className="text-lg text-gray-700">
-              <strong>Medical Condition:</strong> {patient?.medicalCondition}
-            </p>
+            <div className="flex items-center gap-3 p-2 bg-gray-50 border border-gray-100 rounded">
+              <FaPhoneAlt className="text-gray-500" />
+              <div>
+                <span className="text-xs text-gray-500 block">Phone</span>
+                <strong className="text-gray-800">{patient?.phoneNumber || "N/A"}</strong>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-2 bg-gray-50 border border-gray-100 rounded">
+              <FaEnvelope className="text-gray-500" />
+              <div>
+                <span className="text-xs text-gray-500 block">Email</span>
+                <strong className="text-gray-800">{patient?.emailId || "N/A"}</strong>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-2 bg-gray-50 border border-gray-100 rounded">
+              <FaNotesMedical className="text-gray-500" />
+              <div>
+                <span className="text-xs text-gray-500 block">Medical History / Condition</span>
+                <strong className="text-gray-800">{patient?.medicalCondition || "None reported"}</strong>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </>
   );
 };

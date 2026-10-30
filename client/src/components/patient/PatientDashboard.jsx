@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate , Link} from "react-router";
+import { useNavigate } from "react-router-dom";
 import BASE_URL from "../../apiConfig";
 import { toast } from "react-toastify";
-
 import PageMeta from "../common/PageMeta";
 
 const PatientDashboard = () => {
@@ -21,7 +20,6 @@ const PatientDashboard = () => {
     note: "",
   });
   const [districts, setDistricts] = useState([]);
-
   const [selectedHospital, setSelectedHospital] = useState(null);
 
   const fetchDistricts = async (selectedState) => {
@@ -42,7 +40,7 @@ const PatientDashboard = () => {
     try {
       const response = await fetch(url, options);
       const data = await response.json();
-      setDistricts(data);
+      setDistricts(Array.isArray(data) ? data : []);
       setDistrict("");
     } catch (error) {
       console.error("Error fetching districts:", error);
@@ -58,7 +56,7 @@ const PatientDashboard = () => {
 
     setLoading(true);
     setError("");
-   
+
     try {
       const response = await fetch(
         `${BASE_URL}/api/getHospitals?district=${encodeURIComponent(
@@ -71,11 +69,11 @@ const PatientDashboard = () => {
           },
         }
       );
-  
+
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message);
+        throw new Error(data.message || "Failed to load hospitals");
       }
       setHospitals(data);
     } catch (error) {
@@ -94,11 +92,10 @@ const PatientDashboard = () => {
 
   const handleCloseModal = () => {
     setShowModal(false);
-    setRequestData({ units: "", urgency: "", date: "", note: "" });
+    setRequestData({ units: "", urgency: "low", date: "", note: "" });
   };
 
-  const isFormValid =
-    requestData.units && requestData.urgency && requestData.date;
+  const isFormValid = requestData.units && requestData.urgency && requestData.date;
 
   const handleSubmitRequest = async () => {
     if (!isFormValid) return;
@@ -121,7 +118,7 @@ const PatientDashboard = () => {
       urgencyLevel: requestData.urgency,
       requestDate: requestData.date,
       note: requestData.note,
-      token:authToken,
+      token: authToken,
     };
 
     try {
@@ -130,7 +127,7 @@ const PatientDashboard = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(requestBody, authToken),
+        body: JSON.stringify(requestBody),
       });
 
       if (response.ok) {
@@ -186,259 +183,248 @@ const PatientDashboard = () => {
 
   if (isAuthenticating) {
     return (
-      <div className="text-center text-gray-600">
-        Verifying authentication...
+      <div className="p-8 text-center text-sm text-gray-600">
+        Verifying patient authentication...
       </div>
     );
   }
 
   return (
     <>
-    <PageMeta title="PatientDashboard | RaktConnect" />
+      <PageMeta title="Patient Dashboard | RaktConnect" />
 
-    <div className="p-8 mx-auto bg-white rounded-lg border border-gray-200 relative">
-      <h2 className="text-3xl font-bold mb-8 text-gray-900">
-        Patient Dashboard
-      </h2>
-      <div className="md:grid  md:grid-cols-2 lg:grid-cols-3 gap-6 block">
-        <div className="flex flex-col md:flex-row md:space-x-6 w-full col-start-1 col-end-3 gap-2 md:gap-0">
-          {/* State Selection */}
-          <div className="md:w-1/3">
-            <label className="block text-gray-700 font-medium">State</label>
-            <select
-              value={state}
-              onChange={(e) => {
-                setState(e.target.value);
-                fetchDistricts(e.target.value);
-              }}
-              required
-              className="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-            >
-              <option value="">Select State</option>
-              <option value="Andhra Pradesh">Andhra Pradesh</option>
-              <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-              <option value="Assam">Assam</option>
-              <option value="Bihar">Bihar</option>
-              <option value="Chhattisgarh">Chhattisgarh</option>
-              <option value="Goa">Goa</option>
-              <option value="Gujarat">Gujarat</option>
-              <option value="Haryana">Haryana</option>
-              <option value="Himachal Pradesh">Himachal Pradesh</option>
-              <option value="Jharkhand">Jharkhand</option>
-              <option value="Karnataka">Karnataka</option>
-              <option value="Kerala">Kerala</option>
-              <option value="Madhya Pradesh">Madhya Pradesh</option>
-              <option value="Maharashtra">Maharashtra</option>
-              <option value="Manipur">Manipur</option>
-              <option value="Meghalaya">Meghalaya</option>
-              <option value="Mizoram">Mizoram</option>
-              <option value="Nagaland">Nagaland</option>
-              <option value="Odisha">Odisha</option>
-              <option value="Punjab">Punjab</option>
-              <option value="Rajasthan">Rajasthan</option>
-              <option value="Sikkim">Sikkim</option>
-              <option value="Tamil Nadu">Tamil Nadu</option>
-              <option value="Telangana">Telangana</option>
-              <option value="Tripura">Tripura</option>
-              <option value="Uttar Pradesh">Uttar Pradesh</option>
-              <option value="Uttarakhand">Uttarakhand</option>
-              <option value="West Bengal">West Bengal</option>
-              <option value="Andaman and Nicobar Islands">
-                Andaman and Nicobar Islands
-              </option>
-              <option value="Chandigarh">Chandigarh</option>
-              <option value="Dadra and Nagar Haveli and Daman and Diu">
-                Dadra and Nagar Haveli and Daman and Diu
-              </option>
-              <option value="Delhi">Delhi</option>
-              <option value="Lakshadweep">Lakshadweep</option>
-              <option value="Puducherry">Puducherry</option>
-            </select>
+      <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-6xl mx-auto space-y-6">
+          {notification && (
+            <div className="p-3 bg-green-100 border border-green-200 text-green-800 text-xs rounded">
+              {notification}
+            </div>
+          )}
+
+          <div className="border-b border-gray-200 pb-3">
+            <h1 className="text-xl font-bold text-gray-900">Patient Dashboard</h1>
+            <p className="text-xs text-gray-600">Find available blood units at nearby partner hospitals</p>
           </div>
 
-          {/* District Selection */}
-          <div className="md:w-1/3">
-            <label className="block text-gray-700 font-medium">District</label>
-            <select
-              value={district}
-              onChange={(e) => setDistrict(e.target.value)}
-              required
-              className="w-full mt-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+          {/* Search Box */}
+          <div className="bg-white p-5 rounded border border-gray-200 space-y-4">
+            <h2 className="text-sm font-semibold text-gray-900">Find Blood Units</h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">State *</label>
+                <select
+                  value={state}
+                  onChange={(e) => {
+                    setState(e.target.value);
+                    fetchDistricts(e.target.value);
+                  }}
+                  required
+                  className="w-full p-2 border border-gray-300 rounded text-sm bg-white"
+                >
+                  <option value="">Select State</option>
+                  <option value="Andhra Pradesh">Andhra Pradesh</option>
+                  <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                  <option value="Assam">Assam</option>
+                  <option value="Bihar">Bihar</option>
+                  <option value="Chhattisgarh">Chhattisgarh</option>
+                  <option value="Goa">Goa</option>
+                  <option value="Gujarat">Gujarat</option>
+                  <option value="Haryana">Haryana</option>
+                  <option value="Himachal Pradesh">Himachal Pradesh</option>
+                  <option value="Jharkhand">Jharkhand</option>
+                  <option value="Karnataka">Karnataka</option>
+                  <option value="Kerala">Kerala</option>
+                  <option value="Madhya Pradesh">Madhya Pradesh</option>
+                  <option value="Maharashtra">Maharashtra</option>
+                  <option value="Manipur">Manipur</option>
+                  <option value="Meghalaya">Meghalaya</option>
+                  <option value="Mizoram">Mizoram</option>
+                  <option value="Nagaland">Nagaland</option>
+                  <option value="Odisha">Odisha</option>
+                  <option value="Punjab">Punjab</option>
+                  <option value="Rajasthan">Rajasthan</option>
+                  <option value="Sikkim">Sikkim</option>
+                  <option value="Tamil Nadu">Tamil Nadu</option>
+                  <option value="Telangana">Telangana</option>
+                  <option value="Tripura">Tripura</option>
+                  <option value="Uttar Pradesh">Uttar Pradesh</option>
+                  <option value="Uttarakhand">Uttarakhand</option>
+                  <option value="West Bengal">West Bengal</option>
+                  <option value="Delhi">Delhi</option>
+                  <option value="Chandigarh">Chandigarh</option>
+                  <option value="Puducherry">Puducherry</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">District *</label>
+                <select
+                  value={district}
+                  onChange={(e) => setDistrict(e.target.value)}
+                  required
+                  className="w-full p-2 border border-gray-300 rounded text-sm bg-white"
+                >
+                  <option value="">Select District</option>
+                  {districts.map((item, index) => (
+                    <option key={index} value={item.district}>
+                      {item.district}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Required Blood Type *</label>
+                <select
+                  className="w-full p-2 border border-gray-300 rounded text-sm bg-white"
+                  value={bloodType}
+                  onChange={(e) => setBloodType(e.target.value)}
+                >
+                  <option value="">Select Blood Type</option>
+                  <option value="A_positive">A+</option>
+                  <option value="A_negative">A-</option>
+                  <option value="B_positive">B+</option>
+                  <option value="B_negative">B-</option>
+                  <option value="AB_positive">AB+</option>
+                  <option value="AB_negative">AB-</option>
+                  <option value="O_positive">O+</option>
+                  <option value="O_negative">O-</option>
+                </select>
+              </div>
+            </div>
+
+            <button
+              onClick={fetchHospitals}
+              className="bg-red-600 hover:bg-red-700 text-white text-xs font-medium px-4 py-2 rounded"
             >
-              <option value="">Select District</option>
-              {districts.map((district, index) => (
-                <option key={index} value={district.district}>
-                  {district.district}
-                </option>
-              ))}
-            </select>
+              Search Hospitals
+            </button>
           </div>
 
-          {/* Blood Type Selection */}
-          <div className="md:w-1/3">
-            <label className="block font-semibold text-gray-700">
-              Select Blood Type:
-            </label>
-            <select
-              className="border border-gray-300 p-3 w-full mt-1 rounded-lg focus:ring-2 focus:ring-blue-500"
-              value={bloodType}
-              onChange={(e) => setBloodType(e.target.value)}
-            >
-              <option value="">Select Blood Type</option>
-              <option value="A_positive">A+</option>
-              <option value="A_negative">A-</option>
-              <option value="B_positive">B+</option>
-              <option value="B_negative">B-</option>
-              <option value="AB_positive">AB+</option>
-              <option value="AB_negative">AB-</option>
-              <option value="O_positive">O+</option>
-              <option value="O_negative">O-</option>
-            </select>
-          </div>
-        </div>
+          {loading && <p className="text-xs text-gray-600 text-center py-4">Searching hospital databases...</p>}
+          {error && <p className="text-xs text-red-600 text-center py-4">{error}</p>}
 
-        <button
-          className="mt-6 p-2.5 md:px-6 md:w-fit w-full bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition cursor-pointer"
-          onClick={fetchHospitals}
-        >
-          Search Hospitals
-        </button>
-      </div>
+          {/* Hospitals List */}
+          {hospitals.length > 0 && (
+            <div className="space-y-4">
+              <h2 className="text-sm font-semibold text-gray-900">
+                Matching Hospitals ({hospitals.length})
+              </h2>
 
-      {loading && <p className="mt-6 text-gray-600 text-center">Loading...</p>}
-      {error && <p className="mt-6 text-red-500 text-center">{error}</p>}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {hospitals.map((hospital) => (
+                  <div
+                    key={hospital.id || hospital._id}
+                    className="p-4 bg-white border border-gray-200 rounded flex flex-col justify-between"
+                  >
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-900 mb-1">
+                        {hospital.name}
+                      </h3>
+                      <p className="text-xs text-gray-600 mb-1">{hospital.address}</p>
+                      <p className="text-xs text-gray-500 mb-3">Phone: {hospital.phoneNumber || "N/A"}</p>
 
-      {hospitals.length > 0 && (
-        <div className="mt-8">
-          <h3 className="text-3xl font-semibold mb-4 text-gray-800 text-center">
-            Available Hospitals
-          </h3>
-          <ul className="grid grid-cols-3 gap-6">
-            {hospitals.map((hospital) => (
-              <li
-                key={hospital.id}
-                className="border border-gray-300 p-6 rounded-lg shadow-md bg-gray-50 flex justify-between items-center"
-              >
-                <div>
-                  <p className="font-bold text-2xl text-gray-800">
-                    {hospital.name}
-                  </p>
-                  <p className="text-gray-600">{hospital.address}</p>
-                  <p className="text-gray-600">Phone: {hospital.phoneNumber}</p>
-
-                  {/* Blood Inventory Section */}
-                  <p className="text-gray-800 font-semibold mt-2">
-                    Available Blood Inventory:
-                  </p>
-                  <ul className=" text-gray-600">
-                    {hospital.bloodInventory &&
-                      Object.entries(hospital.bloodInventory)
-                        .filter(([type]) => type === bloodType)
-                        .map(
-                          ([bloodType, units]) =>
-                            units > 0 && (
-                              <li key={bloodType} className="mt-1">
-                                <span className="font-semibold">
-                                  {bloodType
-                                    .replace("_positive", "+")
-                                    .replace("_negative", "-")}
+                      <div className="border-t border-gray-100 pt-2 mb-3">
+                        <span className="text-[11px] font-medium text-gray-500 block mb-1">Available Units:</span>
+                        <div className="text-xs text-gray-700">
+                          {hospital.bloodInventory &&
+                            Object.entries(hospital.bloodInventory)
+                              .filter(([type]) => type === bloodType)
+                              .map(([type, units]) => (
+                                <span key={type} className="inline-block bg-red-50 text-red-700 px-2 py-0.5 rounded font-semibold">
+                                  {type.replace("_positive", "+").replace("_negative", "-")}: {units} units
                                 </span>
-                                : {units} units
-                              </li>
-                            )
-                        )}
-                  </ul>
+                              ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      className="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-medium py-1.5 rounded"
+                      onClick={() => handleRequestBlood(hospital)}
+                    >
+                      Request Blood
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Request Modal */}
+          {showModal && (
+            <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+              <div className="bg-white p-5 rounded border border-gray-300 max-w-sm w-full space-y-3">
+                <h3 className="text-base font-bold text-gray-900 border-b border-gray-100 pb-2">
+                  Request Blood from {selectedHospital?.name}
+                </h3>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Units Required *</label>
+                  <input
+                    type="number"
+                    min="1"
+                    className="w-full p-2 border border-gray-300 rounded text-sm"
+                    value={requestData.units}
+                    onChange={(e) => setRequestData({ ...requestData, units: e.target.value })}
+                  />
                 </div>
 
-                <button
-                  className="bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition cursor-pointer"
-                  onClick={() => handleRequestBlood(hospital)}
-                >
-                  Request Blood
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Urgency Level *</label>
+                  <select
+                    className="w-full p-2 border border-gray-300 rounded text-sm bg-white"
+                    value={requestData.urgency}
+                    onChange={(e) => setRequestData({ ...requestData, urgency: e.target.value })}
+                  >
+                    <option value="low">Low (Planned)</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High (Emergency)</option>
+                  </select>
+                </div>
 
-      {showModal && (
-        <div className="fixed inset-0 backdrop-blur-lg bg-black/15 bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg w-[450px] shadow-lg">
-            <h2 className="text-xl font-semibold mb-4">Request Blood</h2>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Needed By Date *</label>
+                  <input
+                    type="date"
+                    className="w-full p-2 border border-gray-300 rounded text-sm"
+                    value={requestData.date}
+                    min={new Date().toISOString().split("T")[0]}
+                    onChange={(e) => setRequestData({ ...requestData, date: e.target.value })}
+                  />
+                </div>
 
-            <label className="block text-gray-700">Units Required:</label>
-            <input
-              type="number"
-              className="border border-gray-300 p-2 w-full rounded-lg mb-3"
-              value={requestData.units}
-              onChange={(e) =>
-                setRequestData({ ...requestData, units: e.target.value })
-              }
-            />
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Doctor Note / Prescription</label>
+                  <textarea
+                    rows="2"
+                    className="w-full p-2 border border-gray-300 rounded text-sm"
+                    value={requestData.note}
+                    onChange={(e) => setRequestData({ ...requestData, note: e.target.value })}
+                  ></textarea>
+                </div>
 
-            <label className="block text-gray-700">Urgency Level:</label>
-            <select
-              className="border border-gray-300 p-2 w-full rounded-lg mb-3"
-              value={requestData.urgency}
-              onChange={(e) =>
-                setRequestData({ ...requestData, urgency: e.target.value })
-              }
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-
-            <label className="block text-gray-700">Request Date:</label>
-            <input
-              type="date"
-              className="border border-gray-300 p-2 w-full rounded-lg mb-3"
-              value={requestData.date}
-              min={new Date().toISOString().split("T")[0]} // Set min date to today
-              onChange={(e) =>
-                setRequestData({ ...requestData, date: e.target.value })
-              }
-            />
-
-            <label className="block text-gray-700">Note:</label>
-            <textarea
-              className="border border-gray-300 p-2 w-full rounded-lg mb-3 h-24 resize-none"
-              value={requestData.note}
-              onChange={(e) =>
-                setRequestData({ ...requestData, note: e.target.value })
-              }
-            ></textarea>
-
-            <div className="flex justify-between">
-              <button
-                className="bg-red-500 text-white px-4 py-2 rounded-lg cursor-pointer transition hover:bg-red-600"
-                onClick={handleCloseModal}
-              >
-                Cancel
-              </button>
-              <button
-                className={`px-4 py-2 rounded-lg text-white transition ${
-                  isFormValid
-                    ? "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-                    : "bg-gray-400 cursor-not-allowed"
-                }`}
-                onClick={handleSubmitRequest}
-                disabled={!isFormValid}
-              >
-                Send Request
-              </button>
+                <div className="flex justify-end gap-2 pt-2 border-t border-gray-100">
+                  <button
+                    className="bg-gray-200 text-gray-700 text-xs px-3 py-1.5 rounded"
+                    onClick={handleCloseModal}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-1.5 rounded disabled:opacity-50"
+                    onClick={handleSubmitRequest}
+                    disabled={!isFormValid}
+                  >
+                    Submit Request
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
-      )}
-
-      {notification && (
-        <div className="mt-4 p-4 bg-green-100 text-green-700 rounded-lg text-center absolute z-10 top-0 right-3">
-          {notification}
-        </div>
-      )}
-    </div>
+      </div>
     </>
   );
 };

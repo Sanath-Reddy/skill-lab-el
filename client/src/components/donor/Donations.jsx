@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
-import { FaCheckCircle, FaClock, FaTimesCircle } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { FaCheckCircle, FaClock } from "react-icons/fa";
 import BASE_URL from "../../apiConfig";
 import PageMeta from "../common/PageMeta";
+
 const Donations = () => {
   const navigate = useNavigate();
   const [donationHistory, setDonationHistory] = useState([]);
@@ -30,8 +31,8 @@ const Donations = () => {
 
         const data = await response.json();
         if (data.success) {
-          setDonationHistory(data.donations);
-          setUpcomingAppointments(data.appointments);
+          setDonationHistory(data.donations || []);
+          setUpcomingAppointments(data.appointments || []);
         }
       } catch (error) {
         console.error("Error fetching donation history:", error);
@@ -43,84 +44,94 @@ const Donations = () => {
 
   return (
     <>
-    <PageMeta title="Donation | RaktConnect" />
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-8">
-      <div className="bg-white p-8 shadow-lg rounded-lg mt-6 border border-gray-300 md:col-span-2">
-        <h3 className="text-2xl font-semibold mb-6 text-gray-800">
-          Donation History
-        </h3>
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-gray-100 text-gray-700">
-              <th className="p-4 text-left">Date</th>
-              <th className="p-4 text-left">Type</th>
-              <th className="p-4 text-left">Volume</th>
-              <th className="p-4 text-left">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {donationHistory.map((donation, index) => (
-              <tr
-                key={index}
-                className="border-b hover:bg-gray-50 transition-colors"
-              >
-                <td className="p-4">{new Date(donation.date).toLocaleDateString()}</td>
-                <td className="p-4">{donation.type}</td>
-                <td className="p-4">{donation.volume}ml</td>
-                <td className={`p-4 font-semibold flex items-center ${
-                  donation.status === "completed" ? "text-green-600" : "text-gray-600"
-                }`}>
-                  {donation.status === "completed" ? (
-                    <FaCheckCircle className="mr-2" />
-                  ) : (
-                    <FaClock className="mr-2" />
-                  )}
-                  {donation.status}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <PageMeta title="My Donations | RaktConnect" />
 
-      <div className="bg-white p-8 shadow-lg rounded-lg mt-6 border border-gray-300">
-        <h3 className="text-2xl font-semibold mb-6 text-gray-800">
-          Upcoming Appointments
-        </h3>
-        {upcomingAppointments.length === 0 ? (
-          <div className="text-center text-gray-600">
-            No upcoming appointments
+      <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-6xl mx-auto space-y-6">
+          <div className="border-b border-gray-200 pb-3">
+            <h1 className="text-xl font-bold text-gray-900">Donation History & Schedule</h1>
+            <p className="text-xs text-gray-600">Track past blood donation records and scheduled visits</p>
           </div>
-        ) : (
-          <ul className="space-y-6">
-            {upcomingAppointments.map((appointment, index) => (
-              <li
-                key={index}
-                className="border p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <p className="font-medium text-gray-800">
-                    {new Date(appointment.date).toLocaleDateString()}
-                  </p>
-                  <p className="text-blue-600 font-semibold">
-                    {appointment.location}
-                  </p>
-                </div>
-                <p className="text-gray-700">
-                  <strong>Type:</strong> {appointment.type}
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Table */}
+            <div className="lg:col-span-2 bg-white p-5 rounded border border-gray-200">
+              <h2 className="text-sm font-semibold text-gray-900 mb-3">
+                Completed Donations
+              </h2>
+
+              {donationHistory.length === 0 ? (
+                <p className="text-xs text-gray-500 py-6 text-center">
+                  No previous donation records logged.
                 </p>
-                <button
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition mt-3"
-                  onClick={() => navigate(`/donor/appointment/${appointment.id}`)}
-                >
-                  View Details
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs text-left border border-gray-200">
+                    <thead className="bg-gray-50 text-gray-700 uppercase font-semibold">
+                      <tr>
+                        <th className="p-2.5 border-b">Date</th>
+                        <th className="p-2.5 border-b">Type</th>
+                        <th className="p-2.5 border-b">Volume</th>
+                        <th className="p-2.5 border-b">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {donationHistory.map((donation, index) => (
+                        <tr key={index} className="hover:bg-gray-50">
+                          <td className="p-2.5">{new Date(donation.date).toLocaleDateString()}</td>
+                          <td className="p-2.5">{donation.type}</td>
+                          <td className="p-2.5">{donation.volume} ml</td>
+                          <td className="p-2.5">
+                            <span className="inline-flex items-center gap-1 font-medium text-green-700">
+                              {donation.status === "completed" ? (
+                                <FaCheckCircle size={12} />
+                              ) : (
+                                <FaClock size={12} className="text-gray-500" />
+                              )}
+                              {donation.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Upcoming */}
+            <div className="bg-white p-5 rounded border border-gray-200">
+              <h2 className="text-sm font-semibold text-gray-900 mb-3">
+                Upcoming Appointments
+              </h2>
+
+              {upcomingAppointments.length === 0 ? (
+                <div className="text-xs text-gray-500 text-center py-6">
+                  No upcoming appointments booked.
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {upcomingAppointments.map((appointment, index) => (
+                    <div key={index} className="p-3 border border-gray-200 rounded text-xs space-y-1">
+                      <div className="font-semibold text-gray-900">
+                        {new Date(appointment.date).toLocaleDateString()}
+                      </div>
+                      <div className="text-gray-600">{appointment.location}</div>
+                      <div className="text-gray-500">Type: {appointment.type}</div>
+                      <button
+                        onClick={() => navigate(`/donor/appointment/${appointment.id}`)}
+                        className="mt-2 text-xs bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded"
+                      >
+                        Details
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
     </>
   );
 };

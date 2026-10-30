@@ -2,14 +2,14 @@ import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Icon } from 'leaflet';
-import { FaClock, FaPhone, FaMapMarkerAlt, FaSearch, FaHeart, FaTint, FaArrowLeft } from 'react-icons/fa';
+import { FaClock, FaPhone, FaMapMarkerAlt, FaSearch, FaArrowLeft } from 'react-icons/fa';
 import PropTypes from 'prop-types';
 import PageMeta from '../common/PageMeta';
+
 const INDIA_CENTER = [20.5937, 78.9629];
 const DEFAULT_ZOOM = 5;
-const SEARCH_ZOOM = 12;
+const SEARCH_ZOOM = 13;
 
-// ✅ Component to update map view dynamically
 const MapController = ({ center, zoom }) => {
   const map = useMap();
 
@@ -27,11 +27,143 @@ const MapController = ({ center, zoom }) => {
   return null;
 };
 
-// ✅ Prop validation for MapController
 MapController.propTypes = {
   center: PropTypes.arrayOf(PropTypes.number).isRequired,
   zoom: PropTypes.number.isRequired,
 };
+
+const bloodBanksDatabase = [
+  {
+    name: "AIIMS Main Blood Bank",
+    city: "Delhi",
+    state: "Delhi",
+    lat: 28.5672,
+    lng: 77.2100,
+    address: "Ansari Nagar, New Delhi",
+    hours: "24/7 Service",
+    contact: "+91-11-26588500",
+  },
+  {
+    name: "Red Cross Blood Center",
+    city: "Delhi",
+    state: "Delhi",
+    lat: 28.6219,
+    lng: 77.2144,
+    address: "1 Red Cross Road, New Delhi",
+    hours: "9:00 AM - 6:00 PM",
+    contact: "+91-11-23716441",
+  },
+  {
+    name: "KEM Hospital Blood Bank",
+    city: "Mumbai",
+    state: "Maharashtra",
+    lat: 19.0024,
+    lng: 72.8427,
+    address: "Parel, Mumbai",
+    hours: "24/7 Service",
+    contact: "+91-22-24107000",
+  },
+  {
+    name: "Tata Memorial Blood Bank",
+    city: "Mumbai",
+    state: "Maharashtra",
+    lat: 19.0048,
+    lng: 72.8436,
+    address: "Dr. E Borges Road, Parel, Mumbai",
+    hours: "24/7 Service",
+    contact: "+91-22-24177000",
+  },
+  {
+    name: "Bangalore Medical College Blood Center",
+    city: "Bangalore",
+    state: "Karnataka",
+    lat: 12.9602,
+    lng: 77.5744,
+    address: "Fort Road, KR Market, Bangalore",
+    hours: "24/7 Service",
+    contact: "+91-80-26701150",
+  },
+  {
+    name: "Apollo Hospital Blood Bank",
+    city: "Chennai",
+    state: "Tamil Nadu",
+    lat: 13.0594,
+    lng: 80.2505,
+    address: "Greams Lane, Thousand Lights, Chennai",
+    hours: "24/7 Service",
+    contact: "+91-44-28290200",
+  },
+  {
+    name: "Calcutta Medical College Blood Bank",
+    city: "Kolkata",
+    state: "West Bengal",
+    lat: 22.5735,
+    lng: 88.3639,
+    address: "College Street, Kolkata",
+    hours: "24/7 Service",
+    contact: "+91-33-22551635",
+  },
+  {
+    name: "Osmania General Hospital Blood Bank",
+    city: "Hyderabad",
+    state: "Telangana",
+    lat: 17.3770,
+    lng: 78.4739,
+    address: "Afzal Gunj, Hyderabad",
+    hours: "24/7 Service",
+    contact: "+91-40-24600121",
+  },
+  {
+    name: "Civil Hospital Blood Center",
+    city: "Ahmedabad",
+    state: "Gujarat",
+    lat: 23.0525,
+    lng: 72.6026,
+    address: "Asarwa, Ahmedabad",
+    hours: "24/7 Service",
+    contact: "+91-79-22683721",
+  },
+  {
+    name: "Sassoon General Hospital Blood Bank",
+    city: "Pune",
+    state: "Maharashtra",
+    lat: 18.5284,
+    lng: 73.8743,
+    address: "Near Pune Station, Pune",
+    hours: "24/7 Service",
+    contact: "+91-20-26128000",
+  },
+  {
+    name: "SMS Hospital Blood Bank",
+    city: "Jaipur",
+    state: "Rajasthan",
+    lat: 26.8962,
+    lng: 75.8167,
+    address: "JLN Marg, Jaipur",
+    hours: "24/7 Service",
+    contact: "+91-141-2560291",
+  },
+  {
+    name: "KGMU Blood Bank",
+    city: "Lucknow",
+    state: "Uttar Pradesh",
+    lat: 26.8693,
+    lng: 80.9161,
+    address: "Chowk, Lucknow",
+    hours: "24/7 Service",
+    contact: "+91-522-2257450",
+  },
+  {
+    name: "PMCH Blood Bank",
+    city: "Patna",
+    state: "Bihar",
+    lat: 25.6207,
+    lng: 85.1589,
+    address: "Ashok Rajpath, Patna",
+    hours: "24/7 Service",
+    contact: "+91-612-2300080",
+  }
+];
 
 const BloodBankLocator = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,25 +173,22 @@ const BloodBankLocator = () => {
   const [mapZoom, setMapZoom] = useState(DEFAULT_ZOOM);
   const [hasSearched, setHasSearched] = useState(false);
 
-  // ...[Rest of the bloodBanksDatabase array, unchanged for brevity]
-  // Please paste your bloodBanksDatabase array here as in your original code
-
-  // Custom marker icon
   const bloodIcon = new Icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
     iconSize: [25, 41],
     iconAnchor: [12, 41]
   });
 
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
+  const handleSearch = async (query = searchQuery) => {
+    const term = query.trim();
+    if (!term) return;
     setLoading(true);
     setHasSearched(true);
-    await new Promise(resolve => setTimeout(resolve, 500));
+
     const filtered = bloodBanksDatabase.filter(bank =>
-      bank.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      bank.state.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      bank.name.toLowerCase().includes(searchQuery.toLowerCase())
+      bank.city.toLowerCase().includes(term.toLowerCase()) ||
+      bank.state.toLowerCase().includes(term.toLowerCase()) ||
+      bank.name.toLowerCase().includes(term.toLowerCase())
     );
     setSearchResults(filtered);
     if (filtered.length > 0) {
@@ -78,268 +207,167 @@ const BloodBankLocator = () => {
 
   return (
     <>
-    <PageMeta title="Blood Bank | RaktConnect" />
+      <PageMeta title="Blood Bank Locator | RaktConnect" />
 
-    <div
-      className="min-h-screen py-0"
-      style={{
-        background: "var(--bg-main)",
-        color: "var(--text-main)"
-      }}
-    >
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 pt-16 sm:pt-18 lg:pt-18 xl:pt-20">
-        <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 lg:gap-6 min-h-[calc(100vh-4rem)] sm:min-h-[calc(100vh-4.5rem)] lg:min-h-[calc(100vh-5rem)] xl:min-h-[calc(100vh-6rem)]">
-          {/* Left Panel - Search and Results */}
-          <div className="w-full lg:w-2/5 flex flex-col">
-            {/* Search Section */}
-            <div
-              className="rounded-lg sm:rounded-xl shadow-lg p-3 sm:p-4 lg:p-3 mb-3 sm:mb-4 lg:mb-6 border"
-              style={{
-                background: "var(--bg-surface)",
-                borderColor: "rgba(255,0,0,0.07)",
-                color: "var(--text-main)",
-              }}
-            >
-              <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 flex items-center" style={{ color: "var(--text-main)" }}>
-                <FaSearch className="mr-2 text-red-600 text-base sm:text-lg" />
-                Search Blood Banks
-              </h2>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Enter city, state, or hospital name..."
-                  className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border-2 border-red-200 rounded-md sm:rounded-lg focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200 transition-all duration-300 pr-10 sm:pr-12"
-                  style={{
-                    background: "var(--bg-main)",
-                    color: "var(--text-main)"
-                  }}
-                />
-                <button
-                  onClick={handleSearch}
-                  disabled={loading}
-                  className="absolute right-2 top-1.5 sm:top-2 bg-red-600 hover:bg-red-700 text-white px-2 sm:px-4 py-1 sm:py-1.5 rounded-md transition-all duration-300 flex items-center disabled:opacity-50"
-                >
-                  {loading ? (
-                    <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-white"></div>
-                  ) : (
-                    <FaSearch className="text-xs sm:text-sm" />
-                  )}
-                </button>
+      <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="border-b border-gray-200 pb-4 mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">
+              Blood Bank Locator
+            </h1>
+            <p className="text-sm text-gray-600 mt-1">
+              Find authorized blood banks and collection centers across cities
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Left Panel */}
+            <div className="lg:col-span-5 space-y-4">
+              {/* Search Box */}
+              <div className="p-4 bg-gray-50 border border-gray-200 rounded">
+                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+                  Search Location / Hospital
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="e.g. Delhi, Bangalore, AIIMS..."
+                    className="flex-1 p-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-red-600"
+                  />
+                  <button
+                    onClick={() => handleSearch()}
+                    disabled={loading}
+                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-1.5"
+                  >
+                    <FaSearch size={12} />
+                    <span>Search</span>
+                  </button>
+                </div>
               </div>
-              <p className="text-xs sm:text-sm mt-2" style={{ color: "var(--text-muted)" }}>
-                Search across major cities in India
-              </p>
-            </div>
 
-            {/* Return to Quick Search Button */}
-            {hasSearched && (
-              <div className="mb-3 sm:mb-4 lg:mb-6">
+              {/* Quick Search */}
+              {!hasSearched ? (
+                <div className="p-4 border border-gray-200 rounded">
+                  <h3 className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">
+                    Quick City Filter
+                  </h3>
+                  <div className="flex flex-wrap gap-1.5">
+                    {['Delhi', 'Mumbai', 'Kolkata', 'Chennai', 'Bangalore', 'Hyderabad', 'Ahmedabad', 'Pune', 'Jaipur', 'Lucknow', 'Patna', 'AIIMS'].map((city, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          setSearchQuery(city);
+                          handleSearch(city);
+                        }}
+                        className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-red-50 hover:text-red-700 border border-gray-200 rounded"
+                      >
+                        {city}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
                 <button
                   onClick={() => {
                     setHasSearched(false);
                     setSearchResults([]);
                     setSearchQuery('');
-                    setMapCenter([20.5937, 78.9629]);
-                    setMapZoom(5);
+                    setMapCenter(INDIA_CENTER);
+                    setMapZoom(DEFAULT_ZOOM);
                   }}
-                  className="bg-red-100 hover:bg-red-200 text-red-700 px-3 sm:px-4 py-2 rounded-md sm:rounded-lg transition-all duration-300 text-xs sm:text-sm font-medium border border-red-200 hover:border-red-300 flex items-center"
+                  className="flex items-center gap-1.5 text-xs text-red-600 font-medium hover:underline"
                 >
-                  <FaArrowLeft className="mr-1 sm:mr-2 text-xs" />
-                  Back to Quick Search
+                  <FaArrowLeft size={10} /> Back to all quick filters
                 </button>
-              </div>
-            )}
+              )}
 
-            {/* Quick Search Suggestions */}
-            {!hasSearched && (
-              <div
-                className="rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-6 mb-3 sm:mb-4 lg:mb-6 border"
-                style={{
-                  background: "var(--bg-surface)",
-                  borderColor: "rgba(255,0,0,0.07)",
-                  color: "var(--text-main)"
-                }}
-              >
-                <h3 className="text-base sm:text-lg font-semibold mb-3 flex items-center" style={{ color: "var(--text-main)" }}>
-                  <FaHeart className="mr-2 text-red-600 text-sm sm:text-base" />
-                  Quick Search
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-2">
-                  {['Delhi', 'Mumbai', 'Kolkata', 'Chennai', 'Bangalore', 'Hyderabad', 'Ahmedabad', 'Pune', 'Jaipur', 'Lucknow', 'Patna', 'AIIMS'].map((city, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        setSearchQuery(city);
-                        setTimeout(handleSearch, 100);
-                      }}
-                      className="bg-red-50 hover:bg-red-100 text-red-700 px-2 sm:px-3 py-1.5 sm:py-2 rounded-md transition-all duration-300 text-xs sm:text-sm font-medium border border-red-200 hover:border-red-300"
-                    >
-                      {city}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Results Section */}
-            <div className="flex-1 overflow-y-auto">
+              {/* Results List */}
               {hasSearched && (
-                <>
-                  {loading ? (
-                    <div
-                      className="text-center py-8 sm:py-12 rounded-lg sm:rounded-xl shadow-lg border"
-                      style={{
-                        background: "var(--bg-surface)",
-                        borderColor: "rgba(255,0,0,0.07)",
-                        color: "var(--text-main)"
-                      }}
-                    >
-                      <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-red-600 mx-auto mb-3 sm:mb-4"></div>
-                      <p className="text-sm sm:text-base" style={{ color: "var(--text-muted)" }}>Searching blood banks...</p>
-                    </div>
-                  ) : searchResults.length > 0 ? (
-                    <div
-                      className="rounded-lg sm:rounded-xl shadow-lg border p-3 sm:p-4 lg:p-6"
-                      style={{
-                        background: "var(--bg-surface)",
-                        borderColor: "rgba(255,0,0,0.07)",
-                        color: "var(--text-main)"
-                      }}
-                    >
-                      <div className="mb-3 sm:mb-4">
-                        <h3 className="text-base sm:text-lg font-bold flex items-center" style={{ color: "var(--text-main)" }}>
-                          <FaTint className="mr-2 text-red-600 text-sm sm:text-base" />
-                          Found {searchResults.length} Blood Bank{searchResults.length !== 1 ? 's' : ''}
-                        </h3>
-                        <p className="text-xs sm:text-sm mt-1" style={{ color: "var(--text-muted)" }}>Click on any card to view location on map</p>
-                      </div>
-                      <div className="space-y-2 sm:space-y-3 max-h-48 sm:max-h-60 lg:max-h-72 overflow-y-auto">
-                        {searchResults.map((bank, index) => (
-                          <div
-                            key={index}
-                            className="rounded-md sm:rounded-lg p-2 sm:p-3 border hover:border-red-300 hover:bg-red-50 transition-all duration-300 cursor-pointer"
-                            style={{
-                              background: "var(--bg-main)",
-                              borderColor: "rgba(200,200,200,0.10)",
-                              color: "var(--text-main)"
-                            }}
-                            onClick={() => {
-                              setMapCenter([bank.lat, bank.lng]);
-                              setMapZoom(15);
-                            }}
-                          >
-                            <div className="flex items-start justify-between mb-1.5 sm:mb-2">
-                              <h4 className="text-sm sm:text-base font-semibold pr-2" style={{ color: "var(--text-main)" }}>{bank.name}</h4>
-                              <FaTint className="text-red-600 text-base sm:text-lg flex-shrink-0" />
-                            </div>
-                            <div className="space-y-1 sm:space-y-1.5 text-xs sm:text-sm" style={{ color: "var(--text-muted)" }}>
-                              <div className="flex items-start gap-2">
-                                <FaMapMarkerAlt className="text-red-500 mt-0.5 sm:mt-1 flex-shrink-0 text-xs" />
-                                <div>
-                                  <p className="font-medium" style={{ color: "var(--text-main)" }}>{bank.city}, {bank.state}</p>
-                                  <p className="text-xs">{bank.address}</p>
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <FaClock className="text-red-500 flex-shrink-0 text-xs" />
-                                <p>{bank.hours}</p>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <FaPhone className="text-red-500 flex-shrink-0 text-xs" />
-                                <p>{bank.contact}</p>
-                              </div>
-                            </div>
-                            <div className="mt-1.5 sm:mt-2 pt-1.5 sm:pt-2 border-t" style={{ borderColor: "rgba(200,200,200,0.10)" }}>
-                              <button className="text-red-600 hover:text-red-700 font-medium text-xs transition-colors duration-300">
-                                View on Map →
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+                <div className="border border-gray-200 rounded p-4">
+                  <div className="text-xs font-semibold text-gray-700 mb-3">
+                    Found {searchResults.length} blood bank{searchResults.length !== 1 ? 's' : ''}
+                  </div>
+
+                  {searchResults.length === 0 ? (
+                    <p className="text-xs text-gray-500 py-4 text-center">
+                      No blood banks found matching "{searchQuery}". Try another city.
+                    </p>
                   ) : (
-                    <div
-                      className="text-center py-8 sm:py-12 rounded-lg sm:rounded-xl shadow-lg border"
-                      style={{
-                        background: "var(--bg-surface)",
-                        borderColor: "rgba(255,0,0,0.07)",
-                        color: "var(--text-main)"
-                      }}
-                    >
-                      <FaSearch className="text-2xl sm:text-3xl text-gray-400 mx-auto mb-3 sm:mb-4" />
-                      <h3 className="text-base sm:text-lg font-semibold mb-2" style={{ color: "var(--text-main)" }}>No Blood Banks Found</h3>
-                      <p className="mb-3 sm:mb-4 text-sm" style={{ color: "var(--text-muted)" }}>
-                        We could not find any blood banks matching
-                      </p>
-                      <p className="text-xs sm:text-sm px-4" style={{ color: "var(--text-muted)" }}>
-                        Try searching for major cities like Delhi, Mumbai, Kolkata, Chennai, etc.
-                      </p>
+                    <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
+                      {searchResults.map((bank, index) => (
+                        <div
+                          key={index}
+                          onClick={() => {
+                            setMapCenter([bank.lat, bank.lng]);
+                            setMapZoom(15);
+                          }}
+                          className="p-3 border border-gray-200 rounded hover:border-red-500 cursor-pointer bg-white"
+                        >
+                          <h4 className="text-sm font-semibold text-gray-900 mb-1">
+                            {bank.name}
+                          </h4>
+                          <p className="text-xs text-gray-600 flex items-start gap-1 mb-1">
+                            <FaMapMarkerAlt className="text-red-600 mt-0.5 flex-shrink-0" />
+                            <span>{bank.address}, {bank.city}</span>
+                          </p>
+                          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 mt-2">
+                            <span className="flex items-center gap-1">
+                              <FaClock className="text-gray-400" /> {bank.hours}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <FaPhone className="text-gray-400" /> {bank.contact}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   )}
-                </>
+                </div>
               )}
             </div>
-          </div>
 
-          {/* Right Panel - Map */}
-          <div className="w-full lg:w-3/5">
-            <div
-              className="rounded-lg sm:rounded-xl shadow-lg p-3 sm:p-4 lg:p-5 border h-full min-h-[240px] sm:min-h-[320px] lg:min-h-[440px]"
-              style={{
-                background: "var(--bg-surface)",
-                borderColor: "rgba(255,0,0,0.07)",
-                color: "var(--text-main)"
-              }}
-            >
-              <h3 className="text-base sm:text-lg lg:text-xl font-semibold mb-3 sm:mb-4 flex items-center" style={{ color: "var(--text-main)" }}>
-                <FaMapMarkerAlt className="mr-2 text-red-600 text-sm sm:text-base lg:text-lg" />
-                Interactive Map
-              </h3>
-              <MapContainer
-                center={INDIA_CENTER}
-                zoom={DEFAULT_ZOOM}
-                className="h-[200px] sm:h-[280px] lg:h-[400px] xl:h-[500px] w-full rounded-md sm:rounded-lg shadow-lg"
-              >
-                <TileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                />
-                <MapController center={mapCenter} zoom={mapZoom} />
-                {searchResults.map((bank, index) => (
-                  <Marker
-                    key={index}
-                    position={[bank.lat, bank.lng]}
-                    icon={bloodIcon}
+            {/* Right Panel - Map */}
+            <div className="lg:col-span-7">
+              <div className="border border-gray-200 rounded overflow-hidden">
+                <div className="bg-gray-50 border-b border-gray-200 px-4 py-2 text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  Map View
+                </div>
+                <div className="h-[450px] w-full">
+                  <MapContainer
+                    center={INDIA_CENTER}
+                    zoom={DEFAULT_ZOOM}
+                    className="h-full w-full"
                   >
-                    <Popup className="custom-popup">
-                      <div className="space-y-2 sm:space-y-3 p-1 sm:p-2">
-                        <h3 className="font-bold text-red-600 text-sm sm:text-base lg:text-lg">{bank.name}</h3>
-                        <div className="flex items-start gap-2">
-                          <FaMapMarkerAlt className="text-red-500 mt-1 flex-shrink-0 text-xs sm:text-sm" />
-                          <p className="text-xs sm:text-sm" style={{ color: "var(--text-main)" }}>{bank.address}</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <FaClock className="text-red-500 text-xs sm:text-sm" />
-                          <p className="text-xs sm:text-sm" style={{ color: "var(--text-muted)" }}>{bank.hours}</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <FaPhone className="text-red-500 text-xs sm:text-sm" />
-                          <p className="text-xs sm:text-sm" style={{ color: "var(--text-muted)" }}>{bank.contact}</p>
-                        </div>
-                      </div>
-                    </Popup>
-                  </Marker>
-                ))}
-              </MapContainer>
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      attribution='&copy; OpenStreetMap contributors'
+                    />
+                    <MapController center={mapCenter} zoom={mapZoom} />
+                    {searchResults.map((bank, index) => (
+                      <Marker
+                        key={index}
+                        position={[bank.lat, bank.lng]}
+                        icon={bloodIcon}
+                      >
+                        <Popup>
+                          <div className="text-xs">
+                            <strong className="text-red-700 block mb-1">{bank.name}</strong>
+                            <p>{bank.address}</p>
+                            <p className="text-gray-500 mt-1">{bank.contact}</p>
+                          </div>
+                        </Popup>
+                      </Marker>
+                    ))}
+                  </MapContainer>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
     </>
   );
 };

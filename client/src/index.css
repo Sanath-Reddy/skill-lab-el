@@ -1,44 +1,31 @@
 @import "tailwindcss";
 
-/* Theme CSS variables */
 :root {
-  --bg-main: #fff;
+  --bg-main: #ffffff;
   --bg-surface: #f9fafb;
-  --text-main: #18181b;
+  --text-main: #111827;
   --text-muted: #6b7280;
-  --accent: #ef4444;
-  --nav-bg: rgba(255,255,255,0.8);
+  --accent: #dc2626;
+  --nav-bg: #ffffff;
 }
 
 .dark {
   --bg-main: #18181b;
-  --bg-surface: #23232b;
+  --bg-surface: #27272a;
   --text-main: #f4f4f5;
   --text-muted: #a1a1aa;
   --accent: #ef4444;
-  --nav-bg: rgba(24,24,27,0.95);
+  --nav-bg: #18181b;
 }
 
 body, html {
-    background: var(--bg-main);
-    color: var(--text-main);
-    transition: background 0.3s, color 0.3s;
-    font-family: var(--font-montserrat), sans-serif;
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-header {
-  background: var(--nav-bg);
-  transition: background 0.3s;
-}
-
-@theme{
-    --font-montserrat:"Montserrat", serif;
-    --color-primary:#C62E2E;
-    --color-secondary:#F9F9F9;
-    --color-calm:#0D92F4;
-}
-
-/* Optional: surface backgrounds for cards, panels, etc. */
 .bg-surface {
   background: var(--bg-surface);
 }
@@ -49,8 +36,4 @@ header {
 
 .text-muted {
   color: var(--text-muted);
-}
-
-::-webkit-scrollbar{
-    display:none
 }

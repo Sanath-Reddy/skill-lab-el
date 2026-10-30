@@ -1,186 +1,110 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { FaUserCircle, FaBell } from "react-icons/fa";
+import { useState } from "react";
+import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
 import { TbLogout } from "react-icons/tb";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const PatientNavbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
 
-  const navItems = ["Dashboard", "Requests" , "Haemoglobin" , "Disease"];
+  const navItems = [
+    { label: "Dashboard", path: "/patient/dashboard" },
+    { label: "Requests", path: "/patient/requests" },
+    { label: "Haemoglobin Predictor", path: "/patient/haemoglobin" },
+    { label: "Disease Checker", path: "/patient/disease" },
+  ];
 
-  const menuVariants = {
-    open: {
-      opacity: 1,
-      height: "auto",
-      transition: {
-        duration: 0.3,
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
-    closed: {
-      opacity: 0,
-      height: 0,
-      transition: {
-        duration: 0.3,
-        staggerChildren: 0.1,
-        staggerDirection: -1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    open: { opacity: 1, y: 0 },
-    closed: { opacity: 0, y: -20 },
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login");
   };
 
   return (
-    <>
-    <header
-      className={`w-full bg-gray-100 transition-all duration-400 text-black`}
-    >
-      <div className="flex justify-between items-center w-full mx-auto px-4 sm:px-6 lg:px-8 py-3">
-        {/* Logo with animation */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-3xl font-extrabold flex items-center"
-        >
-          <img
-            src="https://www.nicepng.com/png/full/364-3647802_blood-symbol-png.png"
-            alt="BloodConnect Logo"
-            className="h-12 w-auto mr-3 drop-shadow-lg transition-transform duration-300 hover:scale-110"
-          />
-          <span className="bg-gradient-to-r bg-slate-950 bg-clip-text text-transparent">
-            RaktConnect
-          </span>
-        </motion.div>
+    <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+      <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+        {/* Brand */}
+        <Link to="/patient/dashboard" className="flex items-center gap-2 font-bold text-lg text-red-600">
+          <span className="w-3 h-3 rounded-full bg-red-600 inline-block"></span>
+          RaktConnect <span className="text-xs font-normal text-gray-500 border border-gray-200 px-1.5 py-0.5 rounded">Patient</span>
+        </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex space-x-10">
-          {navItems.map((item) => (
-            <motion
-              key={item}
-              className="text-lg font-semibold relative group"
-              whilehover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <Link to={`/patient/${item.toLowerCase()}`}>
-                <span className="transition-colors duration-300 hover:text-red-400">
-                  {item}
-                </span>
+        <nav className="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-700">
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <Link
+                key={item.label}
+                to={item.path}
+                className={`hover:text-red-600 ${isActive ? "text-red-600 font-semibold" : ""}`}
+              >
+                {item.label}
               </Link>
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-red-500 transition-all duration-300 group-hover:w-full" />
-            </motion>
-          ))}
-          <Link to="/patient/profile">
-            <motion
-              className="text-lg font-semibold relative group"
-              whilehover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <FaUserCircle className="text-3xl transition-colors duration-300 hover:text-red-400" />
-            </motion>
+            );
+          })}
+
+          <Link
+            to="/patient/profile"
+            className="text-gray-600 hover:text-red-600 flex items-center gap-1"
+            title="Profile"
+          >
+            <FaUserCircle size={18} />
+            <span className="text-xs">Profile</span>
           </Link>
-          <Link to="/patient/notification">
-            <motion
-              className="text-lg font-semibold relative group"
-              whilehover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <FaBell className="text-3xl transition-colors duration-300 hover:text-red-400" />
-            </motion>
-          </Link>
-          
-          <TbLogout
-            className="text-3xl transition-colors duration-300 hover:text-red-400 cursor-pointer"
-            onClick={() => {
-              localStorage.clear();
-              navigate("/login");
-            }}
-          />
+
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-1 text-gray-500 hover:text-red-600 text-xs border border-gray-300 rounded px-2.5 py-1"
+            title="Logout"
+          >
+            <TbLogout size={16} />
+            <span>Logout</span>
+          </button>
         </nav>
 
-        {/* Mobile Menu Button */}
-        <motion.button
-          className="md:hidden p-2 rounded-lg hover:bg-gray-800/50 transition-colors"
+        {/* Mobile menu button */}
+        <button
+          className="md:hidden p-1.5 text-gray-700 border border-gray-300 rounded"
           onClick={() => setIsOpen(!isOpen)}
-          whileTap={{ scale: 0.95 }}
+          aria-label="Toggle navigation"
         >
-          <div className="w-6 h-6 relative">
-            <motion.span
-              className="absolute block w-full h-0.5 bg-red-400 rounded-full"
-              animate={isOpen ? "open" : "closed"}
-              variants={{
-                closed: { top: "0.25rem", rotate: 0 },
-                open: { top: "0.25rem", rotate: 45 },
-              }}
-            />
-            <motion.span
-              className="absolute block w-full h-0.5 bg-red-400 rounded-full"
-              animate={isOpen ? "open" : "closed"}
-              variants={{
-                closed: { top: "0.75rem", rotate: 0 },
-                open: { top: "0.75rem", rotate: -45 },
-              }}
-            />
-          </div>
-        </motion.button>
+          {isOpen ? <FaTimes size={16} /> : <FaBars size={16} />}
+        </button>
       </div>
 
-      {/* Mobile Nav with animation */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.nav
-            initial="closed"
-            animate="open"
-            exit="closed"
-            variants={menuVariants}
-            className="md:hidden overflow-hidden"
+      {/* Mobile menu */}
+      {isOpen && (
+        <div className="md:hidden border-t border-gray-200 bg-white px-4 py-3 space-y-2 text-sm text-gray-700">
+          {navItems.map((item) => (
+            <Link
+              key={item.label}
+              to={item.path}
+              className="block py-1 hover:text-red-600"
+              onClick={() => setIsOpen(false)}
+            >
+              {item.label}
+            </Link>
+          ))}
+          <Link
+            to="/patient/profile"
+            className="block py-1 hover:text-red-600"
+            onClick={() => setIsOpen(false)}
           >
-            <ul className="flex flex-col items-center py-4 space-y-4">
-              {navItems.map((item) => (
-                <motion.li
-                  key={item}
-                  variants={itemVariants}
-                  className="text-lg font-semibold"
-                >
-                  <Link
-                    to={`/patient/${item.toLowerCase()}`}
-                    className=" hover:text-red-400 transition-colors"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {item}
-                  </Link>
-                </motion.li>
-              ))}
-              <Link to="/patient/profile">
-                <motion
-                  className="text-lg font-semibold relative group"
-                  whilehover={{ scale: 1.05 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  <FaUserCircle className="text-3xl transition-colors duration-300 hover:text-red-400" />
-                </motion>
-              </Link>
-              <Link to="/patient/notification">
-                <motion
-                  className="text-lg font-semibold relative group"
-                  whilehover={{ scale: 1.05 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  <FaBell className="text-3xl transition-colors duration-300 hover:text-red-400" />
-                </motion>
-              </Link>
-            </ul>
-          </motion.nav>
-        )}
-      </AnimatePresence>
+            Profile
+          </Link>
+          <button
+            onClick={() => {
+              setIsOpen(false);
+              handleLogout();
+            }}
+            className="w-full text-left py-1 text-red-600 font-medium"
+          >
+            Logout
+          </button>
+        </div>
+      )}
     </header>
-    </>
   );
 };
 

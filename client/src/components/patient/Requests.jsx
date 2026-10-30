@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import {
   FaCheckCircle,
   FaExclamationCircle,
@@ -8,6 +8,7 @@ import {
 import BASE_URL from "../../apiConfig";
 import { toast } from "react-toastify";
 import PageMeta from "../common/PageMeta";
+
 const Requests = () => {
   const navigate = useNavigate();
   const [requestHistory, setRequestHistory] = useState([]);
@@ -25,23 +26,19 @@ const Requests = () => {
       }
 
       try {
-        const response = await fetch(
-          `${BASE_URL}/patient/requestHistory`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ authToken }),
-          }
-        );
+        const response = await fetch(`${BASE_URL}/patient/requestHistory`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ authToken }),
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch blood history");
         }
 
         const data = await response.json();
-        console.log("Blood History:", data);
 
         if (data.success && Array.isArray(data.data)) {
           const newRequestHistory = [];
@@ -49,11 +46,11 @@ const Requests = () => {
 
           data.data.forEach((request) => {
             const formattedData = {
-              _id: request._id, 
+              _id: request._id,
               bloodType: request.bloodType,
               units: request.units,
               urgency: request.urgencyLevel,
-              requestDate: new Date(request.requestDate).toDateString(),
+              requestDate: new Date(request.requestDate).toLocaleDateString(),
               status: request.status,
             };
 
@@ -77,8 +74,6 @@ const Requests = () => {
 
   const cancelRequest = async (requestId) => {
     try {
-      const authToken = localStorage.getItem("authToken");
-
       const response = await fetch(`${BASE_URL}/patient/cancelRequest`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -106,113 +101,103 @@ const Requests = () => {
   };
 
   return (
-  
-      <>
-      <PageMeta title="Requests | RaktConnect" />
+    <>
+      <PageMeta title="My Requests | RaktConnect" />
 
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-8">
-      {/* Request History Section */}
-      <div className="bg-white p-8 shadow-lg rounded-lg mt-6 border border-gray-300 md:col-span-2">
-        <h3 className="text-2xl font-semibold mb-6 text-gray-800">
-          Blood Request History
-        </h3>
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-gray-100 text-gray-700">
-              <th className="p-4 text-left">Date</th>
-              <th className="p-4 text-left">Blood Type</th>
-              <th className="p-4 text-left">Units</th>
-              <th className="p-4 text-left">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {requestHistory.map((request, index) => (
-              <tr
-                key={index}
-                className="border-b hover:bg-gray-50 transition-colors"
-              >
-                <td className="p-4">{request.requestDate}</td>
-                <td className="p-4">{request.bloodType}</td>
-                <td className="p-4">{request.units}</td>
-                <td
-                  className={`p-4 font-semibold flex items-center ${
-                    request.status === "fulfilled"
-                      ? "text-green-600"
-                      : request.status === "active"
-                      ? "text-yellow-500"
-                      : request.status === "accepted"
-                      ? "text-blue-600"
-                      : "text-red-600"
-                  }`}
-                >
-                  {request.status === "fulfilled" && (
-                    <FaCheckCircle className="mr-2" />
-                  )}
-                  {request.status === "active" && (
-                    <FaExclamationCircle className="mr-2" />
-                  )}
-                  {request.status === "rejected" && (
-                    <FaTimesCircle className="mr-2" />
-                  )}
-                  {request.status === "cancelled" && (
-                    <FaTimesCircle className="mr-2" />
-                  )}
-                  {request.status}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Active Requests Section */}
-      <div className="bg-white p-8 shadow-lg rounded-lg mt-6 border border-gray-300">
-        <h3 className="text-2xl font-semibold mb-6 text-gray-800">
-          Active Blood Requests
-        </h3>
-        {activeRequests.length === 0 ? (
-          <div className="text-center text-gray-600">
-            No active requests at the moment.
+      <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-6xl mx-auto space-y-6">
+          <div className="border-b border-gray-200 pb-3">
+            <h1 className="text-xl font-bold text-gray-900">Blood Requests</h1>
+            <p className="text-xs text-gray-600">Track status of your blood requisitions submitted to hospitals</p>
           </div>
-        ) : (
-          <ul className="space-y-6">
-            {activeRequests.map((request, index) => (
-              <li
-                key={index}
-                className="border p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <p className="font-medium text-gray-800">
-                    <strong>Blood Type:</strong> {request.bloodType}
-                  </p>
-                  <p
-                    className={`font-semibold ${
-                      request.urgency === "High"
-                        ? "text-red-600"
-                        : "text-yellow-600"
-                    }`}
-                  >
-                    {request.urgency}
-                  </p>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* History Table */}
+            <div className="lg:col-span-2 bg-white p-5 rounded border border-gray-200">
+              <h2 className="text-sm font-semibold text-gray-900 mb-3">
+                Request Log
+              </h2>
+
+              {requestHistory.length === 0 ? (
+                <div className="text-xs text-gray-500 py-6 text-center">
+                  No previous blood requests recorded.
                 </div>
-                <p className="text-gray-700">
-                  <strong>Units Required:</strong> {request.units}
-                </p>
-                <p className="text-gray-700">
-                  <strong>Requested For:</strong> {request.requestDate}
-                </p>
-                <button
-                  onClick={() => cancelRequest(request._id)}
-                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition mt-3"
-                >
-                  Cancel
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs text-left border border-gray-200">
+                    <thead className="bg-gray-50 text-gray-700 uppercase font-semibold">
+                      <tr>
+                        <th className="p-2.5 border-b">Date</th>
+                        <th className="p-2.5 border-b">Blood Group</th>
+                        <th className="p-2.5 border-b">Units</th>
+                        <th className="p-2.5 border-b">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {requestHistory.map((request, index) => (
+                        <tr key={index} className="hover:bg-gray-50">
+                          <td className="p-2.5">{request.requestDate}</td>
+                          <td className="p-2.5 font-medium">{request.bloodType}</td>
+                          <td className="p-2.5">{request.units}</td>
+                          <td className="p-2.5">
+                            <span className="inline-flex items-center gap-1 font-medium capitalize">
+                              {request.status === "fulfilled" && (
+                                <FaCheckCircle size={12} className="text-green-600" />
+                              )}
+                              {request.status === "active" && (
+                                <FaExclamationCircle size={12} className="text-yellow-600" />
+                              )}
+                              {(request.status === "rejected" || request.status === "cancelled") && (
+                                <FaTimesCircle size={12} className="text-red-600" />
+                              )}
+                              <span>{request.status}</span>
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Active Requests */}
+            <div className="bg-white p-5 rounded border border-gray-200">
+              <h2 className="text-sm font-semibold text-gray-900 mb-3">
+                Active Requests ({activeRequests.length})
+              </h2>
+
+              {activeRequests.length === 0 ? (
+                <div className="text-xs text-gray-500 py-6 text-center">
+                  No pending active requests.
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {activeRequests.map((request) => (
+                    <div key={request._id} className="p-3 border border-gray-200 rounded text-xs space-y-1">
+                      <div className="flex justify-between items-center font-semibold">
+                        <span className="text-gray-900">{request.bloodType} ({request.units} units)</span>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${
+                          request.urgency === "high" ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-800"
+                        }`}>
+                          {request.urgency}
+                        </span>
+                      </div>
+                      <div className="text-gray-500">Needed by: {request.requestDate}</div>
+                      <button
+                        onClick={() => cancelRequest(request._id)}
+                        className="mt-2 w-full text-xs border border-red-600 text-red-600 hover:bg-red-50 py-1 rounded font-medium"
+                      >
+                        Cancel Request
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
     </>
   );
 };

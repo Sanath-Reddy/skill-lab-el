@@ -1,10 +1,9 @@
 import LandingPage from "./components/Landing/LandingPage";
-import { Routes, Route, Outlet } from "react-router";
+import { Routes, Route, Outlet } from "react-router-dom";
 import Navbar from "./components/Landing/Navbar";
 import Footer from "./components/Landing/Footer";
 import Blog from "./components/Landing/Blog";
 import ScrollToTopButton from "./components/Landing/ScrollToTopButton";
-import Blog from "./components/Landing/Blog"
 import Donor from "./components/donor/Donor";
 import About from "./components/Landing/About";
 import Contact from "./components/Landing/Contact";
@@ -30,10 +29,14 @@ import { ToastContainer } from "react-toastify";
 import { SignIn, SignUp } from "@clerk/clerk-react";
 import CompleteProfile from "./components/Auth/CompleteProfile";
 
+const clerkKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
 const AppLayout = () => (
-  <div className="app">
+  <div className="app flex flex-col min-h-screen">
     <Navbar />
-    <Outlet />
+    <main className="flex-1">
+      <Outlet />
+    </main>
     <Footer />
   </div>
 );
@@ -41,7 +44,6 @@ const AppLayout = () => (
 function App() {
   return (
     <>
-    <BrowserRouter>
       <ScrollToTopButton />
       <Routes>
         {/* Layout routes */}
@@ -56,23 +58,23 @@ function App() {
           <Route path="/banks" element={<BloodBanks />} />
         </Route>
 
-        {/*  Clerk Auth Routes */}
+        {/* Auth Routes */}
         <Route path="/login" element={<Auth />} />
         <Route
           path="/login/patient"
-          element={<SignIn routing="path" path="/login/patient" />}
+          element={clerkKey ? <SignIn routing="path" path="/login/patient" /> : <Auth />}
         />
         <Route
           path="/login/donor"
-          element={<SignIn routing="path" path="/login/donor" />}
+          element={clerkKey ? <SignIn routing="path" path="/login/donor" /> : <Auth />}
         />
         <Route
           path="/login/hospital"
-          element={<SignIn routing="path" path="/login/hospital" />}
+          element={clerkKey ? <SignIn routing="path" path="/login/hospital" /> : <Auth />}
         />
         <Route
           path="/sign-up"
-          element={<SignUp routing="path" path="/sign-up" />}
+          element={clerkKey ? <SignUp routing="path" path="/sign-up" /> : <Auth />}
         />
         <Route path="/complete-profile" element={<CompleteProfile />} />
 

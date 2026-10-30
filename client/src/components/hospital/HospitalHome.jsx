@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import MainGraph from "./charts/MainGraph";
 import BASE_URL from "../../apiConfig";
 import PageMeta from "../common/PageMeta";
+
 const initialInventory = {
   A: { units: 15, capacity: 40, donors: 8 },
   B: { units: 25, capacity: 40, donors: 12 },
@@ -24,7 +26,6 @@ const HospitalHome = () => {
   const [inventory, setInventory] = useState(initialInventory);
   const [timeRange, setTimeRange] = useState("7d");
   const [selectedBloodType, setSelectedBloodType] = useState("All");
-  const [activeAlert, setActiveAlert] = useState(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -46,43 +47,6 @@ const HospitalHome = () => {
     }, 5000);
     return () => clearInterval(interval);
   }, []);
-
-  const getStatusColor = (units) => {
-    if (units < 5) return "bg-red-500";
-    if (units < 15) return "bg-amber-400";
-    return "bg-emerald-500";
-  };
-
-  const BloodInventoryCard = ({ type, data }) => (
-    <div className="group p-4 border border-gray-200 rounded-xl bg-white shadow-sm hover:shadow-md transition-all">
-      <div className="flex justify-between items-start mb-3">
-        <div>
-          <h3
-            className={`text-2xl font-bold ${getStatusColor(data.units).replace(
-              "bg",
-              "text"
-            )}`}
-          >
-            {type}+
-          </h3>
-          <p className="text-sm text-gray-500">{data.donors} active donors</p>
-        </div>
-        <span className="text-lg font-semibold">{data.units} Units</span>
-      </div>
-      <div className="w-full bg-gray-100 h-2 rounded-full">
-        <div
-          className={`${getStatusColor(
-            data.units
-          )} h-2 rounded-full transition-all duration-500`}
-          style={{ width: `${(data.units / data.capacity) * 100}%` }}
-        />
-      </div>
-      <div className="mt-2 flex justify-between text-sm text-gray-600">
-        <span>{Math.round((data.units / data.capacity) * 100)}% capacity</span>
-        <span>{data.capacity - data.units} remaining</span>
-      </div>
-    </div>
-  );
 
   const [isAuthenticating, setIsAuthenticating] = useState(true);
   const navigate = useNavigate();
@@ -124,145 +88,161 @@ const HospitalHome = () => {
 
   if (isAuthenticating) {
     return (
-      <div className="text-center text-gray-600">
-        Verifying authentication...
+      <div className="p-8 text-center text-sm text-gray-600">
+        Verifying hospital authentication...
       </div>
     );
   }
 
   return (
     <>
-     <PageMeta title="HospitalHome | RaktConnect" />
-    <div className="p-6 lg:p-8 bg-gray-50 min-h-screen">
-      <header className="mb-8 flex justify-between ">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Blood Management Dashboard
-          </h1>
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            Real-time data updates
+      <PageMeta title="Hospital Dashboard | RaktConnect" />
+
+      {/* Hospital Nav Header */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+          <Link to="/hospital" className="flex items-center gap-2 font-bold text-lg text-red-600">
+            <span className="w-3 h-3 rounded-full bg-red-600 inline-block"></span>
+            RaktConnect <span className="text-xs font-normal text-gray-500 border border-gray-200 px-1.5 py-0.5 rounded">Hospital</span>
+          </Link>
+
+          <div className="flex items-center gap-3">
+            <Link
+              to="/hospital/requestmanagement"
+              className="text-xs font-medium bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded"
+            >
+              Request Management
+            </Link>
+            <button
+              onClick={() => {
+                localStorage.clear();
+                navigate("/login");
+              }}
+              className="text-xs border border-gray-300 text-gray-700 hover:bg-gray-100 px-3 py-1.5 rounded"
+            >
+              Logout
+            </button>
           </div>
         </div>
-        <a href="/hospital/requestmanagement">
-          <button className=" border-2 border-orange-600 py-2 px-4 rounded-lg cursor-pointer hover:bg-orange-600 hover:text-white transition">Request Management</button>
-        </a>
       </header>
 
-      {criticalAlerts.length > 0 && (
-        <div className="mb-8 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <span className="text-red-500 text-xl">⚠️</span>
+      <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-6xl mx-auto space-y-6">
+          <div className="border-b border-gray-200 pb-3 flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-red-700">Critical Alerts</h3>
-              <p className="text-sm text-red-600">
-                {criticalAlerts.length} blood groups require immediate attention
-              </p>
+              <h1 className="text-xl font-bold text-gray-900">
+                Hospital Blood Management
+              </h1>
+              <p className="text-xs text-gray-600">Overview of blood stocks, patient requisitions, and analytics</p>
             </div>
-          </div>
-          <button
-            className="px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-100 rounded-lg"
-            onClick={() => setActiveAlert("alerts")}
-          >
-            View Details →
-          </button>
-        </div>
-      )}
-
-      <div className="mb-8 grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-        {Object.entries(inventory).map(([type, data]) => (
-          <BloodInventoryCard key={type} type={type} data={data} />
-        ))}
-      </div>
-
-      <div className="mb-8 bg-white rounded-xl shadow-sm border border-gray-100">
-        <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <h2 className="text-xl font-semibold text-gray-900">
-            Blood Analytics
-            <span className="ml-2 text-sm font-normal text-gray-500">
-              ({timeRange.replace("d", " day").toUpperCase()})
+            <span className="text-xs bg-green-50 text-green-700 border border-green-200 px-2.5 py-1 rounded">
+              ● Connected
             </span>
-          </h2>
-          <div className="flex gap-2">
-            <select
-              className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-white"
-              value={timeRange}
-              onChange={(e) => setTimeRange(e.target.value)}
-            >
-              <option value="24h">Last 24h</option>
-              <option value="7d">Last 7d</option>
-              <option value="30d">Last 30d</option>
-            </select>
-            <select
-              className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-white"
-              value={selectedBloodType}
-              onChange={(e) => setSelectedBloodType(e.target.value)}
-            >
-              <option value="All">All Types</option>
-              {Object.keys(inventory).map((type) => (
-                <option key={type} value={type}>
-                  {type}+
-                </option>
-              ))}
-            </select>
           </div>
-        </div>
-        <div className="p-4 h-fit">
-          <MainGraph timeRange={timeRange} bloodType={selectedBloodType} />
-        </div>
-      </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h3 className="text-lg font-semibold mb-4">Shortage Predictions</h3>
-          <div className="space-y-4">
-            <div className="p-4 bg-amber-50 rounded-lg flex items-center gap-4">
-              <span className="text-2xl">⚠️</span>
-              <div>
-                <p className="font-medium text-amber-700">
-                  High Risk of O+ Shortage
-                </p>
-                <p className="text-sm text-amber-600">
-                  Predicted 40% demand increase in next 7 days
-                </p>
-              </div>
+          {/* Critical Alerts */}
+          {criticalAlerts.length > 0 && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded text-xs space-y-1">
+              <span className="font-bold text-red-800">Critical Stock Notice:</span>
+              <ul className="list-disc list-inside text-red-700 space-y-0.5">
+                {criticalAlerts.map((alert) => (
+                  <li key={alert.id}>
+                    <strong>{alert.type}:</strong> {alert.message}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <div className="p-4 bg-blue-50 rounded-lg flex items-center gap-4">
-              <span className="text-2xl">ℹ️</span>
-              <div>
-                <p className="font-medium text-blue-700">
-                  Donor Availability Alert
-                </p>
-                <p className="text-sm text-blue-600">
-                  12 compatible donors available within 50km radius
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+          )}
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h3 className="text-lg font-semibold mb-4">Recent Donations</h3>
-          <div className="space-y-3">
-            {recentDonations.map((donation) => (
-              <div
-                key={donation.id}
-                className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg"
-              >
-                <div>
-                  <p className="font-medium">{donation.name}</p>
-                  <p className="text-sm text-gray-500">{donation.type}</p>
+          {/* Inventory Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {Object.entries(inventory).map(([type, data]) => (
+              <div key={type} className="p-4 bg-white border border-gray-200 rounded">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-lg font-bold text-gray-900">{type}+</span>
+                  <span className="text-xs font-semibold text-red-600">{data.units} Units</span>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium">{donation.units} units</p>
-                  <p className="text-sm text-gray-500">{donation.date}</p>
+                <div className="w-full bg-gray-200 h-2 rounded overflow-hidden">
+                  <div
+                    className="bg-red-600 h-full"
+                    style={{ width: `${Math.min(100, (data.units / data.capacity) * 100)}%` }}
+                  />
+                </div>
+                <div className="mt-2 flex justify-between text-[11px] text-gray-500">
+                  <span>Capacity: {data.capacity}</span>
+                  <span>Donors: {data.donors}</span>
                 </div>
               </div>
             ))}
           </div>
+
+          {/* Analytics Graph */}
+          <div className="bg-white p-5 rounded border border-gray-200 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 pb-3">
+              <h2 className="text-sm font-semibold text-gray-900">
+                Blood Stock & Demand Analytics
+              </h2>
+              <div className="flex gap-2">
+                <select
+                  className="px-2 py-1 text-xs border border-gray-300 rounded bg-white"
+                  value={timeRange}
+                  onChange={(e) => setTimeRange(e.target.value)}
+                >
+                  <option value="24h">Last 24 Hours</option>
+                  <option value="7d">Last 7 Days</option>
+                  <option value="30d">Last 30 Days</option>
+                </select>
+                <select
+                  className="px-2 py-1 text-xs border border-gray-300 rounded bg-white"
+                  value={selectedBloodType}
+                  onChange={(e) => setSelectedBloodType(e.target.value)}
+                >
+                  <option value="All">All Blood Groups</option>
+                  {Object.keys(inventory).map((type) => (
+                    <option key={type} value={type}>
+                      {type}+
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <MainGraph timeRange={timeRange} bloodType={selectedBloodType} />
+          </div>
+
+          {/* Predictions & Recent Donations */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-4 bg-white border border-gray-200 rounded space-y-2">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">Demand Forecasting</h3>
+              <div className="p-3 bg-gray-50 border border-gray-200 rounded text-xs space-y-1">
+                <p className="font-semibold text-gray-900">O+ Projected Shortage</p>
+                <p className="text-gray-600">Expected 40% increase in trauma department usage next week.</p>
+              </div>
+              <div className="p-3 bg-gray-50 border border-gray-200 rounded text-xs space-y-1">
+                <p className="font-semibold text-gray-900">Local Donors Matched</p>
+                <p className="text-gray-600">12 verified compatible donors within hospital service area.</p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-white border border-gray-200 rounded space-y-2">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">Recent Donations Logged</h3>
+              <div className="space-y-2">
+                {recentDonations.map((donation) => (
+                  <div key={donation.id} className="flex justify-between items-center text-xs p-2 bg-gray-50 border border-gray-100 rounded">
+                    <div>
+                      <strong className="text-gray-800">{donation.name}</strong>
+                      <span className="text-gray-500 ml-2">({donation.type})</span>
+                    </div>
+                    <div className="text-gray-500">
+                      {donation.units} units • {donation.date}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
     </>
   );
 };

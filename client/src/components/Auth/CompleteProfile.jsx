@@ -1,18 +1,11 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import {
-  FaUser,
-  FaPhoneAlt,
-  FaStethoscope,
-  FaHospitalAlt,
-  FaIdBadge,
-  FaMapMarkerAlt,
-} from "react-icons/fa";
+import PageMeta from "../common/PageMeta";
 
 const CompleteProfile = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const role = queryParams.get("role");
+  const role = queryParams.get("role") || "user";
 
   const [formData, setFormData] = useState({
     name: "",
@@ -37,81 +30,69 @@ const CompleteProfile = () => {
     console.log("Submitted Data:", { role, ...formData });
   };
 
-  const renderDonorFields = () => (
-    <>
-      <Input label="Name" name="name" icon={FaUser} required />
-      <Input label="Age" name="age" type="number" required />
-      <Input label="Contact Number" name="contact" icon={FaPhoneAlt} required />
-    </>
-  );
-
-  const renderPatientFields = () => (
-    <>
-      <Input label="Name" name="name" icon={FaUser} required />
-      <Input label="Age" name="age" type="number" required />
-      <Input label="Contact Number" name="contact" icon={FaPhoneAlt} required />
-      <Input
-        label="Medical Condition (Optional)"
-        name="medicalCondition"
-        icon={FaStethoscope}
-      />
-    </>
-  );
-
-  const renderHospitalFields = () => (
-    <>
-      <Input label="Hospital Name" name="name" icon={FaHospitalAlt} required />
-      <Input
-        label="License Number"
-        name="licenseNumber"
-        icon={FaIdBadge}
-        required
-      />
-      <Input label="Contact" name="contact" icon={FaPhoneAlt} required />
-      <Input label="State" name="state" icon={FaMapMarkerAlt} required />
-      <Input label="District" name="district" icon={FaMapMarkerAlt} required />
-    </>
-  );
-
-  const Input = ({ label, name, type = "text", icon: Icon, required }) => (
+  const Input = ({ label, name, type = "text", required }) => (
     <div>
-      <label className="block text-sm font-medium mb-1">{label}</label>
-      <div className="relative">
-        {Icon && <Icon className="absolute left-3 top-3 text-gray-400" />}
-        <input
-          name={name}
-          type={type}
-          value={formData[name]}
-          onChange={handleChange}
-          required={required}
-          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
+      <label className="block text-xs font-medium text-gray-700 mb-1">{label}</label>
+      <input
+        name={name}
+        type={type}
+        value={formData[name]}
+        onChange={handleChange}
+        required={required}
+        className="w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-red-600"
+      />
     </div>
   );
 
   return (
-    <div className="max-w-xl mx-auto p-6 bg-white rounded-2xl shadow-lg">
-      <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">
-        Complete {role?.charAt(0).toUpperCase() + role?.slice(1)} Profile
-      </h2>
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        {role === "donor" && renderDonorFields()}
-        {role === "patient" && renderPatientFields()}
-        {role === "hospital" && renderHospitalFields()}
+    <>
+      <PageMeta title="Complete Profile | RaktConnect" />
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">
-          Submit
-        </button>
-      </form>
-      {submitted && (
-        <div className="mt-4 text-green-600 text-center font-medium">
-          ✅ Profile submitted successfully!
+      <div className="min-h-screen py-12 px-4 bg-gray-50 flex items-center justify-center">
+        <div className="max-w-md w-full bg-white p-6 rounded border border-gray-300 shadow-sm">
+          <h2 className="text-xl font-bold text-center text-gray-900 mb-1">
+            Complete {role.charAt(0).toUpperCase() + role.slice(1)} Profile
+          </h2>
+          <p className="text-xs text-gray-500 text-center mb-6">
+            Please fill in your basic account details
+          </p>
+
+          <form className="space-y-3" onSubmit={handleSubmit}>
+            <Input label="Full Name / Org Name" name="name" required />
+            <Input label="Contact Number" name="contact" required />
+
+            {role !== "hospital" && (
+              <Input label="Age" name="age" type="number" required />
+            )}
+
+            {role === "patient" && (
+              <Input label="Medical Notes (Optional)" name="medicalCondition" />
+            )}
+
+            {role === "hospital" && (
+              <>
+                <Input label="Hospital License Number" name="licenseNumber" required />
+                <Input label="State" name="state" required />
+                <Input label="District" name="district" required />
+              </>
+            )}
+
+            <button
+              type="submit"
+              className="w-full bg-red-600 text-white py-2 px-4 rounded text-sm font-medium hover:bg-red-700 mt-4"
+            >
+              Save Profile
+            </button>
+          </form>
+
+          {submitted && (
+            <div className="mt-4 p-3 bg-green-50 border border-green-200 text-green-800 text-xs text-center rounded">
+              Profile details submitted successfully!
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 };
 

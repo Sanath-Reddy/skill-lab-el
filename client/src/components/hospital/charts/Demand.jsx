@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
 import PageMeta from "../../common/PageMeta";
-const API_URL = "https://raktconnect-ai-backend.onrender.com/predict/bloodDemand"; 
+
+const API_URL = "https://raktconnect-ai-backend.onrender.com/predict/bloodDemand";
 
 const BloodDemandChart = () => {
   const [predictions, setPredictions] = useState([]);
@@ -26,31 +27,34 @@ const BloodDemandChart = () => {
       });
   }, []);
 
-  if (loading) return <p className="text-center text-gray-500">Loading predictions...</p>;
-  if (error) return <p className="text-center text-red-500">Error: {error}</p>;
+  if (loading) return <p className="text-center text-xs text-gray-500 py-6">Loading predictions...</p>;
+  if (error) return <p className="text-center text-xs text-red-500 py-6">Error: {error}</p>;
 
   return (
     <>
-     <PageMeta title="Demand | RaktConnect" />
-    <div className="p-6 bg-white shadow-lg rounded-lg">
-      <h3 className="text-xl font-semibold mb-4 text-gray-700 text-center">Blood Demand Forecast</h3>
-      {predictions.length > 0 ? (
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={predictions}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis 
-              dataKey="ds" 
-              tickFormatter={(tick) => new Date(tick).toLocaleDateString()} 
-            />
-            <YAxis />
-            <Tooltip />
-            <Line type="monotone" dataKey="yhat" stroke="#E53E3E" strokeWidth={3} />
-          </LineChart>
-        </ResponsiveContainer>
-      ) : (
-        <p className="text-center text-gray-500">No prediction data available</p>
-      )}
-    </div>
+      <PageMeta title="Demand Forecast | RaktConnect" />
+      <div className="p-4 bg-white border border-gray-200 rounded">
+        <h3 className="text-sm font-semibold mb-3 text-gray-800 text-center">
+          Blood Demand Forecast
+        </h3>
+        {predictions.length > 0 ? (
+          <ResponsiveContainer width="100%" height={260}>
+            <LineChart data={predictions} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+              <XAxis 
+                dataKey="ds" 
+                tick={{ fontSize: 10 }}
+                tickFormatter={(tick) => new Date(tick).toLocaleDateString(undefined, { month: "short", day: "numeric" })} 
+              />
+              <YAxis tick={{ fontSize: 11 }} />
+              <Tooltip />
+              <Line type="monotone" dataKey="yhat" stroke="#dc2626" strokeWidth={2} dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <p className="text-center text-xs text-gray-500 py-6">No prediction data available</p>
+        )}
+      </div>
     </>
   );
 };

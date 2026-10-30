@@ -1,7 +1,7 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import PageMeta from '../common/PageMeta';
+
 const predefinedSymptoms = [
   "fever", "cough", "headache", "nausea", "fatigue",
   "sore throat", "vomiting", "diarrhea", "rash", "chills",
@@ -18,26 +18,8 @@ function Disease() {
   const [prediction, setPrediction] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [highlightIndex, setHighlightIndex] = useState(-1);
-  const [quoteIndex, setQuoteIndex] = useState(0);
 
   const inputRef = useRef(null);
-
-  const quotes = [
-    "Your body hears everything your mind says — stay positive.",
-    "Health is not just about what you're eating. It's also about what you're thinking and saying.",
-    "A healthy outside starts from the inside.",
-    "Don't count the days, make the days count — and stay healthy.",
-    "Every symptom is your body's way of whispering — listen closely.",
-    "You don’t have to be perfect to be healthy — just consistent.",
-    "Take care of your body. It's the only place you have to live."
-  ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setQuoteIndex((prev) => (prev + 1) % quotes.length);
-    }, 5000); // change every 5 seconds
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     const filtered = predefinedSymptoms.filter(
@@ -81,6 +63,11 @@ function Disease() {
   };
 
   const handlePredict = async () => {
+    if (selectedSymptoms.length === 0) {
+      toast.warn("Please add at least one symptom.");
+      return;
+    }
+
     try {
       const response = await fetch('https://raktconnect-ai-backend.onrender.com/predict/disease', {
         method: 'POST',
@@ -90,7 +77,7 @@ function Disease() {
 
       const data = await response.json();
       setPrediction(data.predicted_disease);
-      toast.success('Prediction successful! The prediction disease is ' + data.predicted_disease);
+      toast.success('Disease analysis completed.');
     } catch (error) {
       console.error('Error predicting disease:', error);
       toast.error('Failed to predict disease. Please try again.');
@@ -99,86 +86,92 @@ function Disease() {
 
   return (
     <>
-    <PageMeta title="Disease | RakhtConnect" />
+      <PageMeta title="Disease Checker | RaktConnect" />
 
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-rose-100 to-red-50 px-4 font-sans">
-      
-      {/* 💬 Motivational Quote */}
-      <div className="mb-6 max-w-2xl text-center px-4">
-        <p className="text-red-700 text-base italic font-medium bg-red-50 border border-red-100 rounded-lg py-2 px-4 shadow-sm transition-opacity duration-500">
-          {quotes[quoteIndex]}
-        </p>
-      </div>
+      <div className="min-h-screen py-10 px-4 bg-gray-50 flex items-center justify-center">
+        <div className="bg-white p-6 rounded border border-gray-300 w-full max-w-xl shadow-sm">
+          <div className="border-b border-gray-200 pb-3 mb-4">
+            <h1 className="text-lg font-bold text-gray-900">
+              Symptom-based Disease Checker
+            </h1>
+            <p className="text-xs text-gray-500">
+              Select current symptoms to run machine-learning diagnostic assessment
+            </p>
+          </div>
 
-      {/* 🔍 Disease Predictor Card */}
-      <div className="bg-white/70 backdrop-blur-md p-8 sm:p-10 rounded-3xl shadow-xl w-full max-w-2xl transition-all duration-500">
-        <h1 className="text-3xl font-bold text-center text-red-800 mb-6">
-          💉 Disease Predictor
-        </h1>
-
-        {/* Tags */}
-        <div className="flex flex-wrap gap-3 mb-4">
-          {selectedSymptoms.map((symptom, idx) => (
-            <span
-              key={idx}
-              className="bg-gradient-to-r from-red-100 to-red-50 text-red-800 px-3 py-1 rounded-full text-sm font-medium shadow-sm flex items-center animate-fadeIn"
-            >
-              {symptom}
-              <button
-                className="ml-2 text-red-400 hover:text-red-600 font-bold"
-                onClick={() => removeSymptom(symptom)}
-              >
-                ×
-              </button>
-            </span>
-          ))}
-        </div>
-
-        {/* Input Field */}
-        <div className="relative w-full mb-6">
-          <input
-            type="text"
-            ref={inputRef}
-            value={symptomInput}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            placeholder="e.g. fever, headache..."
-            className="w-full px-4 py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-300 shadow-inner"
-          />
-
-          {suggestions.length > 0 && (
-            <ul className="absolute top-full left-0 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto z-20 animate-fadeIn">
-              {suggestions.map((symptom, index) => (
-                <li
-                  key={index}
-                  className={`px-4 py-2 text-sm cursor-pointer ${
-                    highlightIndex === index ? 'bg-red-100 text-red-800' : 'hover:bg-gray-100'
-                  }`}
-                  onClick={() => handleSuggestionClick(symptom)}
+          {/* Selected tags */}
+          <div className="min-h-[40px] p-2 bg-gray-50 border border-gray-200 rounded mb-3 flex flex-wrap gap-1.5 items-center">
+            {selectedSymptoms.length === 0 ? (
+              <span className="text-xs text-gray-400">No symptoms selected yet. Type below to add.</span>
+            ) : (
+              selectedSymptoms.map((symptom, idx) => (
+                <span
+                  key={idx}
+                  className="bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 rounded text-xs font-medium flex items-center gap-1"
                 >
                   {symptom}
-                </li>
-              ))}
-            </ul>
+                  <button
+                    className="text-red-500 hover:text-red-800 font-bold"
+                    onClick={() => removeSymptom(symptom)}
+                    title="Remove symptom"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))
+            )}
+          </div>
+
+          {/* Input Field */}
+          <div className="relative w-full mb-4">
+            <label className="block text-xs font-medium text-gray-700 mb-1">
+              Add Symptom (type and hit Enter or click a suggestion):
+            </label>
+            <input
+              type="text"
+              ref={inputRef}
+              value={symptomInput}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              placeholder="e.g. fever, headache, cough..."
+              className="w-full p-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-red-600"
+            />
+
+            {suggestions.length > 0 && (
+              <ul className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-300 rounded shadow-md max-h-48 overflow-y-auto z-20">
+                {suggestions.map((symptom, index) => (
+                  <li
+                    key={index}
+                    className={`px-3 py-1.5 text-xs cursor-pointer ${
+                      highlightIndex === index ? 'bg-red-50 text-red-700' : 'hover:bg-gray-50'
+                    }`}
+                    onClick={() => handleSuggestionClick(symptom)}
+                  >
+                    {symptom}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <button
+            onClick={handlePredict}
+            className="w-full py-2 rounded bg-red-600 hover:bg-red-700 text-white text-xs font-medium transition-colors"
+          >
+            Run Diagnostic Check
+          </button>
+
+          {prediction && (
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded text-xs text-red-800">
+              <span className="font-semibold">Predicted Condition: </span>
+              <strong className="text-red-900 text-sm">{prediction}</strong>
+              <p className="text-[11px] text-gray-600 mt-1">
+                Note: This is an academic prediction tool and does not substitute professional medical diagnosis.
+              </p>
+            </div>
           )}
         </div>
-
-        {/* Predict Button */}
-        <button
-          onClick={handlePredict}
-          className="w-full py-3 rounded-xl bg-gradient-to-r from-red-400 to-red-300 text-white font-semibold shadow-md hover:from-red-500 hover:to-red-400 transition duration-300"
-        >
-          ❤️ Predict Disease
-        </button>
-
-        {/* Prediction Output */}
-        {prediction && (
-          <div className="mt-6 text-center text-lg bg-red-100 text-red-700 font-semibold py-3 px-4 rounded-xl shadow-sm animate-fadeIn">
-            🧬 Predicted Disease: <span className="text-red-800">{prediction}</span>
-          </div>
-        )}
       </div>
-    </div>
     </>
   );
 }

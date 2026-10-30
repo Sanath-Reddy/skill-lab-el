@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Mail, Phone, MapPin } from "lucide-react";
 import BASE_URL from "../../apiConfig";
 import PageMeta from "../common/PageMeta";
+
 const checkDonorInfo = async () => {
   const token = localStorage.getItem("authToken");
   if (!token) return { error: "No auth token found" };
@@ -126,7 +127,6 @@ const DonorDashboard = () => {
     try {
       const response = await fetch(url);
       const data = await response.json();
-      console.log("Fetched Districts:", data);
 
       if (data.records && Array.isArray(data.records)) {
         setDistricts(
@@ -157,7 +157,6 @@ const DonorDashboard = () => {
     try {
       const response = await fetch(url);
       const data = await response.json();
-      console.log("Fetched Blood Banks:", data);
 
       if (data.data && Array.isArray(data.data)) {
         const bloodBankList = data.data.map((entry) => ({
@@ -201,190 +200,197 @@ const DonorDashboard = () => {
 
   return (
     <>
-    <PageMeta title="DonorDashboard | RaktConnect" />
+      <PageMeta title="Donor Dashboard | RaktConnect" />
 
-
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="w-full  bg-white shadow-lg rounded-lg p-6">
-        {missingInfo ? (
-          <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
-            <h2 className="text-xl font-semibold text-center text-gray-700">
-              Complete Your Profile
-            </h2>
-
-            <label className="block">
-              <span className="text-gray-600">Blood Type:</span>
-              <select
-                name="bloodType"
-                className="mt-1 block w-full p-2 border rounded-lg focus:ring focus:ring-blue-300"
-                value={formData.bloodType}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select Blood Type</option>
-                <option value="A_positive">A+</option>
-                <option value="A_negative">A-</option>
-                <option value="B_positive">B+</option>
-                <option value="B_negative">B-</option>
-                <option value="AB_positive">AB+</option>
-                <option value="AB_negative">AB-</option>
-                <option value="O_positive">O+</option>
-                <option value="O_negative">O-</option>
-              </select>
-            </label>
-
-            <label className="block">
-              <span className="text-gray-600">Last Donation Date:</span>
-              <input
-                type="date"
-                name="lastDonationDate"
-                value={formData.lastDonationDate}
-                onChange={handleChange}
-                max={new Date().toISOString().split("T")[0]}
-                required
-                className="mt-1 block w-full p-2 border rounded-lg focus:ring focus:ring-blue-300"
-              />
-            </label>
-
-            <label className="block">
-              <span className="text-gray-600">State:</span>
-              <select
-                name="state"
-                value={formData.state}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full p-2 border rounded-lg focus:ring focus:ring-blue-300"
-              >
-                <option value="">Select State</option>
-                {statesList.map((state) => (
-                  <option key={state.value} value={state.label}>
-                    {state.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="block">
-              <span className="text-gray-600">District:</span>
-              <select
-                name="district"
-                value={formData.district}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full p-2 border rounded-lg focus:ring focus:ring-blue-300"
-              >
-                <option value="">Select District</option>
-                {districts.length > 0 ? (
-                  districts.map((districtObj, index) => (
-                    <option key={index} value={districtObj.district}>
-                      {districtObj.district}
-                    </option>
-                  ))
-                ) : (
-                  <option value="">No districts found</option>
-                )}
-              </select>
-            </label>
-
-            <label className="block">
-              <span className="text-gray-600">Medical Condition:</span>
-              <input
-                type="text"
-                name="medicalCondition"
-                value={formData.medicalCondition}
-                onChange={handleChange}
-                className="mt-1 block w-full p-2 border rounded-lg focus:ring focus:ring-blue-300"
-              />
-            </label>
-
-            <button
-              type="submit"
-              className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
-            >
-              Submit
-            </button>
-          </form>
-        ) : (
-          <div className="min-h-screen bg-red-50 py-12 px-6">
-            <div className="max-w-7xl mx-auto">
-              <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-                <span className="text-red-600">Nearby</span> Blood Banks
+      <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          {missingInfo ? (
+            <div className="max-w-md mx-auto bg-white p-6 rounded border border-gray-300 shadow-sm">
+              <h2 className="text-lg font-bold text-gray-900 mb-1 text-center">
+                Complete Donor Information
               </h2>
+              <p className="text-xs text-gray-500 mb-4 text-center">
+                Please update your blood group and location details
+              </p>
+
+              <form onSubmit={handleSubmit} className="space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Blood Type *
+                  </label>
+                  <select
+                    name="bloodType"
+                    className="w-full p-2 border border-gray-300 rounded text-sm bg-white"
+                    value={formData.bloodType}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Select Blood Type</option>
+                    <option value="A_positive">A+</option>
+                    <option value="A_negative">A-</option>
+                    <option value="B_positive">B+</option>
+                    <option value="B_negative">B-</option>
+                    <option value="AB_positive">AB+</option>
+                    <option value="AB_negative">AB-</option>
+                    <option value="O_positive">O+</option>
+                    <option value="O_negative">O-</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Last Donation Date *
+                  </label>
+                  <input
+                    type="date"
+                    name="lastDonationDate"
+                    value={formData.lastDonationDate}
+                    onChange={handleChange}
+                    max={new Date().toISOString().split("T")[0]}
+                    required
+                    className="w-full p-2 border border-gray-300 rounded text-sm bg-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    State *
+                  </label>
+                  <select
+                    name="state"
+                    value={formData.state}
+                    onChange={handleChange}
+                    required
+                    className="w-full p-2 border border-gray-300 rounded text-sm bg-white"
+                  >
+                    <option value="">Select State</option>
+                    {statesList.map((state) => (
+                      <option key={state.value} value={state.label}>
+                        {state.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    District *
+                  </label>
+                  <select
+                    name="district"
+                    value={formData.district}
+                    onChange={handleChange}
+                    required
+                    className="w-full p-2 border border-gray-300 rounded text-sm bg-white"
+                  >
+                    <option value="">Select District</option>
+                    {districts.map((districtObj, index) => (
+                      <option key={index} value={districtObj.district}>
+                        {districtObj.district}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Medical Notes (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    name="medicalCondition"
+                    value={formData.medicalCondition}
+                    onChange={handleChange}
+                    placeholder="None"
+                    className="w-full p-2 border border-gray-300 rounded text-sm bg-white"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 rounded text-sm mt-3"
+                >
+                  Save & Continue
+                </button>
+              </form>
+            </div>
+          ) : (
+            <div>
+              <div className="border-b border-gray-200 pb-4 mb-6 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h1 className="text-xl font-bold text-gray-900">
+                    Nearby Blood Banks
+                  </h1>
+                  <p className="text-xs text-gray-600">
+                    Showing authorized collection centers in your district ({formData.district || "Default"})
+                  </p>
+                </div>
+                {donor && (
+                  <div className="text-xs bg-white border border-gray-200 px-3 py-1.5 rounded">
+                    <span className="text-gray-500">Registered Blood Group: </span>
+                    <strong className="text-red-600">{donor.bloodType?.replace("_", " ") || "Not set"}</strong>
+                  </div>
+                )}
+              </div>
 
               {bloodBanks.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {bloodBanks.map((bank, index) => (
-                    (bank.contact || bank.email) ? (
+                    (bank.contact || bank.email || bank.address) ? (
                       <div
-                      key={index}
-                      className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden "
-                    >
-                      <div className="p-6">
-                        <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-xl font-semibold text-gray-900 truncate">
-                            {bank.name || "Unnamed Blood Bank"}
-                          </h3>
-                          <div
-                            className="w-2 h-2 rounded-full bg-green-500"
-                            title="Open"
-                          ></div>
-                        </div>
-
-                        <div className="space-y-3">
-                          <div className="flex items-start space-x-3 h-[13vh] overflow-scroll">
-                            <MapPin className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
-                            <p className="text-gray-600">
-                              {bank.address || "No address available"}
-                            </p>
+                        key={index}
+                        className="bg-white rounded border border-gray-200 p-4 flex flex-col justify-between"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-sm font-semibold text-gray-900 truncate">
+                              {bank.name || "Blood Bank Center"}
+                            </h3>
+                            <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">
+                              Open
+                            </span>
                           </div>
 
-                          <div className="flex items-center space-x-3">
-                            <Mail className="w-5 h-5 text-red-500 flex-shrink-0" />
-                            {bank.email ? (
-                              <a
-                                href={`mailto:${bank.email}`}
-                                className="text-blue-600 hover:text-blue-800 transition-colors duration-200"
-                              >
-                                {bank.email}
-                              </a>
-                            ) : (
-                              <span className="text-gray-500">
-                                No email available
-                              </span>
+                          <div className="space-y-1.5 text-xs text-gray-600 mb-3">
+                            <p className="flex items-start gap-1">
+                              <MapPin size={14} className="text-red-500 mt-0.5 flex-shrink-0" />
+                              <span>{bank.address || "Address not provided"}</span>
+                            </p>
+                            {bank.email && (
+                              <p className="flex items-center gap-1">
+                                <Mail size={14} className="text-red-500 flex-shrink-0" />
+                                <a href={`mailto:${bank.email}`} className="text-blue-600 hover:underline">
+                                  {bank.email}
+                                </a>
+                              </p>
+                            )}
+                            {bank.contact && (
+                              <p className="flex items-center gap-1">
+                                <Phone size={14} className="text-red-500 flex-shrink-0" />
+                                <span>{bank.contact}</span>
+                              </p>
                             )}
                           </div>
-
-                          <div className="flex items-center space-x-3">
-                            <Phone className="w-5 h-5 text-red-500 flex-shrink-0" />
-                            <p className="text-gray-600">
-                              {bank.contact || "No contact available"}
-                            </p>
-                          </div>
                         </div>
-                      </div>
 
-                      <div className="px-6 py-4 bg-gray-50 border-t">
-                        <button className=" cursor-pointer w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors duration-200 font-medium">
+                        <button className="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-medium py-1.5 rounded">
                           Book Appointment
                         </button>
                       </div>
-                    </div>
                     ) : null
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12 bg-white rounded-lg shadow">
-                  <p className="text-gray-600 text-lg">
-                    No blood banks found in your area
+                <div className="text-center py-12 bg-white rounded border border-gray-200">
+                  <p className="text-sm text-gray-600">
+                    No blood banks found in the selected district. Please check district settings.
                   </p>
                 </div>
               )}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
-    
     </>
   );
 };

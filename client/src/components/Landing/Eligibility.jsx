@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
-import { format, differenceInMonths } from "date-fns";
-import bloodDonationImg from '/public/bloodDonation.png';
+import { differenceInMonths } from "date-fns";
 import PageMeta from '../common/PageMeta';
-const Eligibility = () => {
 
+const Eligibility = () => {
   const [formData, setFormData] = useState({
-    age: "", weight: "", lastDonation: "", chronicDisease: "No", diseaseName: "", recentProcedure: "No", feelingHealthy: "Yes",
+    age: "",
+    weight: "",
+    lastDonation: "",
+    chronicDisease: "No",
+    diseaseName: "",
+    recentProcedure: "No",
+    feelingHealthy: "Yes",
   });
 
   const [eligibility, setEligibility] = useState(null);
@@ -29,199 +34,163 @@ const Eligibility = () => {
     if (age < 18 || age > 65) {
       setEligibility("Not eligible: Age must be between 18 and 65.");
     } else if (weight < 50) {
-      setEligibility("Not eligible: Minimum weight should be more than 50 kg.");
+      setEligibility("Not eligible: Minimum weight should be at least 50 kg.");
     } else if (formData.chronicDisease === "Yes" && !formData.diseaseName.trim()) {
       setEligibility("Not eligible: Please specify your chronic disease.");
     } else if (formData.chronicDisease === "Yes") {
-      setEligibility("Not eligible: You have a chronic disease.");
+      setEligibility("Not eligible: Chronic conditions restrict regular blood donation.");
     } else if (formData.recentProcedure === "Yes") {
-      setEligibility("Not eligible: Wait 6 months after tattoo/piercing/surgery.");
+      setEligibility("Not eligible: Please wait 6 months after tattoo, piercing, or major surgery.");
     } else if (formData.feelingHealthy === "No") {
-      setEligibility("Not eligible: You must be in good health to donate.");
+      setEligibility("Not eligible: You must be in good current health to donate.");
     } else if (monthsSinceLastDonation < 3) {
       setEligibility("Not eligible: You must wait at least 3 months between donations.");
     } else {
-      setEligibility("Eligible: You meet the requirements to donate blood.");
+      setEligibility("Eligible: You meet the basic requirements to donate blood.");
     }
   };
 
   return (
     <>
-    <PageMeta title="Eligibility | RaktConnect" />
+      <PageMeta title="Eligibility | RaktConnect" />
 
-    <div
-      className="min-h-screen pt-24 px-4 pb-20"
-      style={{
-        background: "var(--bg-main)",
-        color: "var(--text-main)"
-      }}
-    >
-      <h1
-        className="text-6xl font-extrabold text-center mb-3 p-6"
-        style={{ color: "var(--accent)" }}
-      >
-        Blood Donation Eligibility Test
-      </h1>
-      <p
-        className="text-center max-w-3xl mx-auto text-m font-medium mb-10 pb-5"
-        style={{ color: "var(--text-muted)" }}
-      >
-        Donating blood is a simple, safe, and life-saving act, but not everyone is eligible at all times.
-        To ensure both your safety and the safety of the patient receiving your blood, take our Donor Eligibility Test for a quick self-assessment.
-      </p>
-      <div className="flex flex-col md:flex-row gap-8 items-start max-w-6xl mx-auto">
-        <div className="w-full md:w-1/2">
-          <div
-            className="p-6 space-y-4 shadow-xl rounded-lg"
-            style={{
-              background: "var(--bg-surface)",
-              color: "var(--text-main)"
-            }}
-          >
-            <div className="space-y-1">
-              <label className="block font-medium">Age</label>
-              <input
-                className="w-full border p-2 rounded"
-                style={{
-                  background: "var(--bg-main)",
-                  color: "var(--text-main)",
-                  borderColor: "rgba(200,200,200,0.13)"
-                }}
-                type="number"
-                name="age"
-                value={formData.age}
-                onChange={handleChange}
-              />
+      <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-2xl mx-auto">
+          <div className="border-b border-gray-200 pb-4 mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">
+              Donor Eligibility Checker
+            </h1>
+            <p className="text-sm text-gray-600 mt-1">
+              Verify if you meet the medical guidelines for donating blood safely
+            </p>
+          </div>
+
+          <div className="p-6 bg-gray-50 border border-gray-200 rounded space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Age (years) *
+                </label>
+                <input
+                  type="number"
+                  name="age"
+                  value={formData.age}
+                  onChange={handleChange}
+                  placeholder="e.g. 25"
+                  className="w-full p-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-red-600"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Weight (kg) *
+                </label>
+                <input
+                  type="number"
+                  name="weight"
+                  value={formData.weight}
+                  onChange={handleChange}
+                  placeholder="e.g. 60"
+                  className="w-full p-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-red-600"
+                />
+              </div>
             </div>
-            <div className="space-y-1">
-              <label className="block font-medium">Weight (kg)</label>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Last Blood Donation Date *
+              </label>
               <input
-                className="w-full border p-2 rounded"
-                style={{
-                  background: "var(--bg-main)",
-                  color: "var(--text-main)",
-                  borderColor: "rgba(200,200,200,0.13)"
-                }}
-                type="number"
-                name="weight"
-                value={formData.weight}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="block font-medium">Last Donation Date</label>
-              <input
-                className="w-full border p-2 rounded"
-                style={{
-                  background: "var(--bg-main)",
-                  color: "var(--text-main)",
-                  borderColor: "rgba(200,200,200,0.13)"
-                }}
                 type="date"
                 name="lastDonation"
                 value={formData.lastDonation}
                 onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-red-600"
               />
             </div>
-            <div className="space-y-1">
-              <label className="block font-medium">Do you have any chronic diseases?</label>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Do you have any chronic conditions (e.g. cardiac, kidney, cancer)?
+              </label>
               <select
                 name="chronicDisease"
                 value={formData.chronicDisease}
                 onChange={handleChange}
-                className="w-full border p-2 rounded"
-                style={{
-                  background: "var(--bg-main)",
-                  color: "var(--text-main)",
-                  borderColor: "rgba(200,200,200,0.13)"
-                }}
+                className="w-full p-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-red-600"
               >
                 <option value="No">No</option>
                 <option value="Yes">Yes</option>
               </select>
             </div>
+
             {formData.chronicDisease === "Yes" && (
-              <div className="space-y-1">
-                <label className="block font-medium">If Yes, please specify</label>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  If yes, please specify condition
+                </label>
                 <input
-                  className="w-full border p-2 rounded"
-                  style={{
-                    background: "var(--bg-main)",
-                    color: "var(--text-main)",
-                    borderColor: "rgba(200,200,200,0.13)"
-                  }}
+                  type="text"
                   name="diseaseName"
                   value={formData.diseaseName}
                   onChange={handleChange}
+                  placeholder="Condition name"
+                  className="w-full p-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-red-600"
                 />
               </div>
             )}
-            <div className="space-y-1">
-              <label className="block font-medium">Have you had a tattoo, piercing, or surgery in the last 6 months?</label>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Tattoo, piercing, or surgical procedure in the last 6 months?
+              </label>
               <select
                 name="recentProcedure"
                 value={formData.recentProcedure}
                 onChange={handleChange}
-                className="w-full border p-2 rounded"
-                style={{
-                  background: "var(--bg-main)",
-                  color: "var(--text-main)",
-                  borderColor: "rgba(200,200,200,0.13)"
-                }}
+                className="w-full p-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-red-600"
               >
                 <option value="No">No</option>
                 <option value="Yes">Yes</option>
               </select>
             </div>
-            <div className="space-y-1">
-              <label className="block font-medium">Are you currently feeling healthy?</label>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Are you currently feeling completely fit and healthy?
+              </label>
               <select
                 name="feelingHealthy"
                 value={formData.feelingHealthy}
                 onChange={handleChange}
-                className="w-full border p-2 rounded"
-                style={{
-                  background: "var(--bg-main)",
-                  color: "var(--text-main)",
-                  borderColor: "rgba(200,200,200,0.13)"
-                }}
+                className="w-full p-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-red-600"
               >
                 <option value="Yes">Yes</option>
                 <option value="No">No</option>
               </select>
             </div>
+
             <button
-              className="w-full mt-4 py-2 px-4 rounded hover:bg-red-700 transition"
-              style={{
-                background: "var(--accent)",
-                color: "#fff"
-              }}
               onClick={checkEligibility}
+              className="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 rounded transition-colors"
             >
-              Check Eligibility
+              Evaluate Eligibility
             </button>
+
             {eligibility && (
               <div
-                className="mt-4 p-4 rounded text-center font-medium"
-                style={{
-                  background: "var(--bg-main)",
-                  color: eligibility.startsWith("Eligible") ? "var(--accent)" : "var(--text-muted)"
-                }}
+                className={`p-3 rounded text-xs sm:text-sm border font-medium text-center ${
+                  eligibility.startsWith("Eligible")
+                    ? "bg-green-50 text-green-800 border-green-200"
+                    : "bg-red-50 text-red-800 border-red-200"
+                }`}
               >
                 {eligibility}
               </div>
             )}
           </div>
         </div>
-        <div className="w-full md:w-1/2 flex justify-center items-center">
-          <img
-            src={bloodDonationImg}
-            alt="Donate Blood"
-            className="pt-15 w-full max-w-md object-contain"
-          />
-        </div>
       </div>
-    </div>
     </>
   );
 };

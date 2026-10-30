@@ -4,6 +4,10 @@ import { BrowserRouter } from "react-router-dom";
 const ClerkProviderWrapper = ({ children }) => {
   const clerkKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
+  if (!clerkKey) {
+    return <BrowserRouter>{children}</BrowserRouter>;
+  }
+
   return (
     <ClerkProvider
       publishableKey={clerkKey}
@@ -13,11 +17,12 @@ const ClerkProviderWrapper = ({ children }) => {
           showOptionalFields: false,
         },
         variables: {
-          colorPrimary: "#2563eb", 
-          colorBackground: "#ffffff", 
-          colorText: "#1f2937", 
+          colorPrimary: "#dc2626",
+          colorBackground: "#ffffff",
+          colorText: "#1f2937",
         },
-      }}>
+      }}
+    >
       <BrowserRouter>{children}</BrowserRouter>
     </ClerkProvider>
   );

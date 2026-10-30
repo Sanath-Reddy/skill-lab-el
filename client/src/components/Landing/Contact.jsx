@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PageMeta from '../common/PageMeta';
+
 const Contact = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -26,10 +27,9 @@ const Contact = () => {
     }
 
     setIsSuccess(true);
-    setModalMessage('✅ Message sent successfully!');
+    setModalMessage('Message sent successfully!');
     setShowModal(true);
 
-    // Reset form
     setName('');
     setEmail('');
     setMessage('');
@@ -41,162 +41,110 @@ const Contact = () => {
 
   return (
     <>
-    <PageMeta title="Contact | RaktConnect" />
+      <PageMeta title="Contact | RaktConnect" />
 
-    <div
-      className="relative min-h-screen py-16 px-4 sm:px-6 lg:px-8"
-      style={{
-        background: "var(--bg-main)",
-        color: "var(--text-main)"
-      }}
-    >
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold mb-4 mt-12" style={{ color: "var(--accent)" }}>
-            Contact Us
-          </h1>
-          <p className="text-xl" style={{ color: "var(--text-muted)" }}>
-            Get in touch with our support team
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-12">
-          <div
-            className="rounded-xl shadow-lg p-8"
-            style={{
-              background: "var(--bg-surface)",
-              color: "var(--text-main)"
-            }}
-          >
-            <h2 className="text-2xl font-semibold mb-6" style={{ color: "var(--text-main)" }}>
-              Contact Information
-            </h2>
-            <div className="space-y-4" style={{ color: "var(--text-muted)" }}>
-              <p>📞 24/7 Helpline: 1-800-555-HELP</p>
-              <p>📧 Email: support@raktconnect.org</p>
-              <p>📍 Headquarters: 123 Life Saver Street, Health City</p>
-            </div>
+      <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <div className="border-b border-gray-200 pb-4 mb-8">
+            <h1 className="text-2xl font-bold text-gray-900">Contact Us</h1>
+            <p className="text-sm text-gray-600 mt-1">
+              Reach out to our support coordinators or submit an inquiry
+            </p>
           </div>
 
-          <div
-            className="rounded-xl shadow-lg p-8"
-            style={{
-              background: "var(--bg-surface)",
-              color: "var(--text-main)"
-            }}
-          >
-            <h2 className="text-2xl font-semibold mb-6" style={{ color: "var(--text-main)" }}>
-              Send a Message
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <input
-                  type="text"
-                  placeholder="Your Name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-red-500"
-                  style={{
-                    background: "var(--bg-main)",
-                    color: "var(--text-main)",
-                    borderColor: "rgba(200,200,200,0.13)"
-                  }}
-                />
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Info */}
+            <div className="p-6 bg-gray-50 border border-gray-200 rounded">
+              <h2 className="text-base font-semibold text-gray-900 mb-4">
+                Helpline & Office Details
+              </h2>
+              <div className="space-y-3 text-sm text-gray-700">
+                <p>
+                  <span className="font-medium text-gray-900">Helpline:</span> 1-800-555-HELP
+                </p>
+                <p>
+                  <span className="font-medium text-gray-900">Email:</span> support@raktconnect.org
+                </p>
+                <p>
+                  <span className="font-medium text-gray-900">Address:</span> 123 Health Lab Road, Sector 4, Bangalore
+                </p>
+                <p>
+                  <span className="font-medium text-gray-900">Operating Hours:</span> 24/7 for emergency blood requests
+                </p>
               </div>
-              <div>
-                <input
-                  type="email"
-                  placeholder="Your Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-red-500"
-                  style={{
-                    background: "var(--bg-main)",
-                    color: "var(--text-main)",
-                    borderColor: "rgba(200,200,200,0.13)"
-                  }}
-                />
-              </div>
-              <div>
-                <textarea
-                  placeholder="Your Message"
-                  rows="4"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-red-500"
-                  style={{
-                    background: "var(--bg-main)",
-                    color: "var(--text-main)",
-                    borderColor: "rgba(200,200,200,0.13)"
-                  }}
-                ></textarea>
-              </div>
-              <button
-                type="submit"
-                className="w-full py-3 rounded-lg hover:bg-red-700 transition-colors"
-                style={{
-                  background: "var(--accent)",
-                  color: "#fff"
-                }}
-              >
-                Send Message
-              </button>
-            </form>
+            </div>
+
+            {/* Form */}
+            <div className="p-6 bg-white border border-gray-200 rounded">
+              <h2 className="text-base font-semibold text-gray-900 mb-4">
+                Send a Message
+              </h2>
+              <form onSubmit={handleSubmit} className="space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Your Name
+                  </label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Enter your name"
+                    className="w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-red-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="name@example.com"
+                    className="w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-red-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Message
+                  </label>
+                  <textarea
+                    rows="3"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Write your query here..."
+                    className="w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-red-600"
+                  ></textarea>
+                </div>
+                <button
+                  type="submit"
+                  className="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 rounded"
+                >
+                  Send Message
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div
-            className="p-6 sm:p-8 rounded-2xl shadow-2xl w-[90%] sm:w-[400px] text-center relative animate-fadeIn transition-all duration-300"
-            style={{
-              background: "var(--bg-surface)",
-              color: "var(--text-main)"
-            }}
-          >
-            {/* Close Icon */}
-            <button
-              onClick={closeModal}
-              className="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl font-bold"
-              aria-label="Close"
-            >
-              &times;
-            </button>
-
-            {/* Icon */}
-            <div className="mb-4">
-              {isSuccess ? (
-                <div className="text-green-600 text-4xl">✅</div>
-              ) : (
-                <div className="text-red-600 text-4xl">❌</div>
-              )}
-            </div>
-
-            {/* Title */}
-            <h3 className={`text-2xl font-semibold mb-2 ${isSuccess ? 'text-green-600' : 'text-red-600'}`}>
-              {isSuccess ? 'Success' : 'Error'}
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <div className="bg-white p-6 rounded border border-gray-300 max-w-sm w-full text-center">
+            <h3 className={`text-base font-bold mb-2 ${isSuccess ? 'text-green-700' : 'text-red-600'}`}>
+              {isSuccess ? 'Success' : 'Notice'}
             </h3>
-
-            {/* Message */}
-            <p className="mb-6" style={{ color: "var(--text-muted)" }}>{modalMessage}</p>
-
-            {/* OK Button */}
+            <p className="text-sm text-gray-600 mb-4">{modalMessage}</p>
             <button
               onClick={closeModal}
-              className={`px-6 py-2 rounded-lg font-medium text-white shadow-md transition-colors ${
-                isSuccess
-                  ? 'bg-green-600 hover:bg-green-700'
-                  : 'bg-red-600 hover:bg-red-700'
-              }`}
+              className="bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs font-medium px-4 py-1.5 rounded"
             >
               OK
             </button>
           </div>
         </div>
       )}
-    </div>
     </>
   );
 };
